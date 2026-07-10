@@ -42,15 +42,17 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
 .reminder-card:hover{background:rgba(255,255,255,.03)}
 .reminder-card.done{opacity:.5;border-color:rgba(76,175,80,.15)}
 .reminder-card.done .rc-train{text-decoration:line-through}
-.reminder-card.warn-yellow{border-color:rgba(255,200,0,.4);background:rgba(255,200,0,.04)}
-.reminder-card.warn-red{border-color:rgba(255,50,50,.4);background:rgba(255,50,50,.05);animation:pulse 1s infinite}
+.reminder-card.warn-yellow{background:rgba(255,200,0,.12);border-color:rgba(255,200,0,.3)}
+.reminder-card.warn-red{background:rgba(255,50,50,.12);border-color:rgba(255,50,50,.3)}
+.reminder-card.warn-pulse{background:rgba(255,50,50,.15);border-color:rgba(255,50,50,.4);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 rgba(255,50,50,0)}50%{box-shadow:0 0 12px rgba(255,50,50,.2)}}
 .countdown-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;margin-bottom:4px;font-size:15px}
 .countdown-bar .cd-label{color:rgba(255,255,255,.3)}
 .countdown-bar .cd-time{font-family:'SF Mono','Consolas',monospace;font-size:24px;font-weight:900;color:#fa0}
 .countdown-bar .cd-now{font-family:'SF Mono','Consolas',monospace;font-size:20px;font-weight:700;color:rgba(255,255,255,.5)}
 .countdown-bar .cd-time.urgent-yellow{color:#ffc800}
-.countdown-bar .cd-time.urgent-red{color:#f33;animation:pulse 1s infinite}
+.countdown-bar .cd-time.urgent-red{color:#f33}
+.countdown-bar .cd-time.urgent-pulse{color:#f33;animation:pulse 1s infinite}
 .countdown-bar .cd-status{font-size:13px;padding:4px 12px;border-radius:6px}
 .cd-status.normal{background:rgba(76,175,80,.1);color:#4caf50}
 .cd-status.urgent{background:rgba(255,200,0,.1);color:#ffc800}
@@ -74,24 +76,27 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
 .btn-remind{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.25);color:#4caf50}
 .btn-remind:hover{background:rgba(76,175,80,.15)}
 .btn-remind.done-state{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.3)}
+.btn-preview{background:rgba(33,150,243,.1);border:1px solid rgba(33,150,243,.25);color:#2196f3}
+.btn-preview:hover{background:rgba(33,150,243,.15)}
 .empty{text-align:center;padding:40px;color:rgba(255,255,255,.15)}
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.3);color:#4caf50;padding:10px 24px;border-radius:8px;font-size:15px;z-index:999;animation:toastIn .3s}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .warn-box{padding:16px 18px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.12);border-radius:8px;margin-bottom:14px;font-size:16px;color:rgba(255,255,255,.5);text-align:center}
-.control-bar{display:flex;align-items:center;gap:16px;margin-bottom:14px;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;flex-wrap:wrap}
-.ctrl-group{display:flex;align-items:center;gap:8px}
-.ctrl-group label{font-size:12px;color:rgba(255,255,255,.4);white-space:nowrap}
-.ctrl-group select{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;font-family:inherit;cursor:pointer}
-.ctrl-group select option{background:#1a1a2e;color:#fff}
-.toggle-switch{position:relative;display:inline-block;width:44px;height:24px;cursor:pointer}
-.toggle-switch input{display:none}
-.toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.15);border-radius:12px;transition:.3s}
-.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
-.toggle-switch input:checked+.toggle-slider{background:#00e6b4}
-.toggle-switch input:checked+.toggle-slider:before{transform:translateX(20px)}
-.btn-test{padding:8px 16px;background:rgba(0,230,180,.1);border:1px solid rgba(0,230,180,.2);border-radius:8px;color:#00e6b4;font-size:13px;font-family:inherit;cursor:pointer;transition:all .2s}
-.btn-test:hover{background:rgba(0,230,180,.2)}
-.btn-test:active{transform:scale(.96)}
+.voice-toggle{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;margin-bottom:14px;font-size:14px;cursor:pointer;user-select:none}
+.voice-toggle .vt-label{color:rgba(255,255,255,.3)}
+.voice-toggle .vt-switch{width:44px;height:24px;background:rgba(255,255,255,.1);border-radius:12px;position:relative;transition:all .3s;flex-shrink:0}
+.voice-toggle .vt-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:all .3s}
+.voice-toggle.on .vt-switch{background:#4caf50}
+.voice-toggle.on .vt-switch::after{left:22px}
+.voice-toggle .vt-status{font-size:13px;font-weight:600;padding:2px 10px;border-radius:4px;transition:all .3s}
+.voice-toggle .vt-status.on{color:#4caf50;background:rgba(76,175,80,.1)}
+.voice-toggle .vt-status.off{color:#ff5252;background:rgba(255,82,82,.1)}
+.role-selector{padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;margin-bottom:14px;font-size:14px;display:flex;align-items:center;gap:8px}
+.role-selector label{color:rgba(255,255,255,.3);white-space:nowrap}
+.role-selector select{background:rgba(0,0,0,.3);border:1px solid rgba(33,150,243,.2);border-radius:6px;padding:6px 12px;color:#fff;font-size:14px;font-family:inherit;cursor:pointer;flex:1}
+.role-selector .role-badge{font-size:12px;padding:3px 10px;border-radius:4px;flex-shrink:0}
+.role-badge.selected{background:rgba(33,150,243,.1);color:#2196f3}
+.role-badge.none{background:rgba(255,255,255,.03);color:rgba(255,255,255,.25)}
 </style>
 </head>
 <body>
@@ -110,6 +115,25 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
   <span class="tt-badge active" id="ttBadge">数据就绪</span>
 </div>
 
+<div class="voice-toggle on" id="voiceToggle" onclick="toggleVoice()">
+  <span class="vt-label">🔊 语音提醒</span>
+  <div class="vt-switch"></div>
+  <span class="vt-status on" id="voiceStatus">已开启</span>
+</div>
+
+<div class="role-selector">
+  <label>岗位</label>
+  <select id="roleSelect" onchange="switchRole(this.value)">
+    <option value="none" selected>不选择岗位</option>
+    <option value="瓦屋庄派班">瓦屋庄派班员</option>
+    <option value="东郭庄派班">东郭庄派班员</option>
+    <option value="安顺派班">安顺派班员</option>
+    <option value="东郭庄轮值">东郭庄轮值</option>
+    <option value="王家港轮值">王家港轮值</option>
+  </select>
+  <span class="role-badge none" id="roleBadge">不触发语音</span>
+</div>
+
 <div class="mode-toggle">
   <button class="mode-btn active" id="btnFirst" onclick="switchMode('first')">
     <span class="mode-icon">🌅</span><span class="mode-label">首班车提醒</span>
@@ -120,27 +144,6 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
   <button class="mode-btn" id="btnSkip" onclick="switchMode('skip')">
     <span class="mode-icon">🏃</span><span class="mode-label">跳停回厂</span>
   </button>
-</div>
-
-<div class="control-bar">
-  <div class="ctrl-group">
-    <label>岗位</label>
-    <select id="roleSelect" onchange="switchRole(this.value)">
-      <option value="瓦屋庄派班员">瓦屋庄派班员</option>
-      <option value="东郭庄派班员">东郭庄派班员</option>
-      <option value="安顺派班员">安顺派班员</option>
-      <option value="东郭庄轮值">东郭庄轮值</option>
-      <option value="王家港轮值">王家港轮值</option>
-    </select>
-  </div>
-  <div class="ctrl-group">
-    <label>语音提醒</label>
-    <label class="toggle-switch">
-      <input type="checkbox" id="voiceToggle" checked onchange="toggleVoice(this.checked)">
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-  <button class="btn-test" onclick="testVoice()">🔊 试听</button>
 </div>
 
 <div id="infoBanner" style="display:none;padding:14px 18px;background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.15);border-radius:8px;margin-bottom:14px;font-size:14px">
@@ -187,7 +190,6 @@ function loadTT(key) {
   currentTT = key;
   TT = getTTData(key);
   tmap = {};
-  if (!TT) { console.error('岗点提醒: 数据加载失败', key); return; }
   for (var i = 0; i < TT.trains.length; i++) {
     tmap[TT.trains[i].no] = TT.trains[i];
   }
@@ -260,13 +262,16 @@ var TRAIN_CONFIG = {};
 // --- Z01152 (工作日) ---
 TRAIN_CONFIG['Z01152'] = {
   first: [
-    { depot:'瓦屋庄', trainNo:'011013', label:'青岛站首班', factoryTrain:'011001', factoryDepot:'瓦屋庄停车场' },
-    { depot:'瓦屋庄', trainNo:'022015', label:'王家港首班', factoryTrain:'021002', factoryDepot:'瓦屋庄停车场' },
-    { depot:'瓦屋庄', trainNo:'102010', label:'青岛站首班', factoryTrain:'101006', factoryDepot:'瓦屋庄停车场' },
-    { depot:'东郭庄', trainNo:'221016', label:'东郭庄首班', factoryTrain:'221016', factoryDepot:'东郭庄停车场' },
-    { depot:'安顺',   trainNo:'031019', label:'瑞金路首班',   factoryTrain:'032001', factoryDepot:'安顺车辆段' },
-    { depot:'安顺',   trainNo:'181018', label:'青岛北站首班', factoryTrain:'182013', factoryDepot:'安顺车辆段' },
-    { depot:'安顺',   trainNo:'212014', label:'青岛北站首班', factoryTrain:'212014', factoryDepot:'安顺车辆段' }
+    // 瓦屋庄停车场
+    { depot:'瓦屋庄', trainNo:'011013', label:'青岛站下行首班', factoryTrain:'011001', factoryDepot:'瓦屋庄停车场', factoryTime:'04:58:12', departTime:'05:30:00' },
+    { depot:'瓦屋庄', trainNo:'022015', label:'王家港上行首班', factoryTrain:'021002', factoryDepot:'瓦屋庄停车场', factoryTime:'04:58:52', departTime:'05:30:00' },
+    { depot:'瓦屋庄', trainNo:'102010', label:'青岛站上行首班', factoryTrain:'101006', factoryDepot:'瓦屋庄停车场', factoryTime:'05:11:48', departTime:'05:30:00' },
+    // 东郭庄停车场
+    { depot:'东郭庄', trainNo:'221016', label:'东郭庄下行首班', factoryTrain:'221016', factoryDepot:'东郭庄停车场', factoryTime:'05:27:26', departTime:'05:30:00' },
+    // 安顺车辆段
+    { depot:'安顺',   trainNo:'031019', label:'瑞金路下行首班',   factoryTrain:'032001', factoryDepot:'安顺车辆段',   factoryTime:'05:00:27', departTime:'05:30:00' },
+    { depot:'安顺',   trainNo:'181018', label:'青岛北站下行首班', factoryTrain:'182013', factoryDepot:'安顺车辆段',   factoryTime:'05:24:32', departTime:'05:30:00' },
+    { depot:'安顺',   trainNo:'212014', label:'青岛北站上行首班', factoryTrain:'212014', factoryDepot:'安顺车辆段',   factoryTime:'05:26:47', departTime:'05:30:00' }
   ],
   last: [
     { station:'东郭庄', trainNo:'021235', type:'全程',   endStation:'王家港' },
@@ -318,15 +323,16 @@ TRAIN_CONFIG['Z01152'] = {
 // --- Z01647 (周末) ---
 TRAIN_CONFIG['Z01647'] = {
   first: [
-    // 下行
-    { depot:'东郭庄', trainNo:'211016', label:'东郭庄首班',   factoryTrain:'211016', factoryDepot:'东郭庄停车场' },
-    { depot:'安顺',   trainNo:'031019', label:'瑞金路首班',   factoryTrain:'032001', factoryDepot:'安顺车辆段' },
-    { depot:'安顺',   trainNo:'181020', label:'青岛北站首班', factoryTrain:'182011', factoryDepot:'安顺车辆段' },
-    { depot:'瓦屋庄', trainNo:'011015', label:'青岛站首班',   factoryTrain:'011001', factoryDepot:'瓦屋庄停车场' },
-    // 上行
-    { depot:'瓦屋庄', trainNo:'022014', label:'王家港首班',   factoryTrain:'021002', factoryDepot:'瓦屋庄停车场' },
-    { depot:'瓦屋庄', trainNo:'112008', label:'青岛站首班',   factoryTrain:'111007', factoryDepot:'瓦屋庄停车场' },
-    { depot:'安顺',   trainNo:'202013', label:'青岛北站首班', factoryTrain:'202013', factoryDepot:'安顺车辆段' }
+    // 东郭庄停车场
+    { depot:'东郭庄', trainNo:'211016', label:'东郭庄下行首班',   factoryTrain:'211016', factoryDepot:'东郭庄停车场', factoryTime:'05:27:26', departTime:'05:30:00' },
+    // 安顺车辆段
+    { depot:'安顺',   trainNo:'031019', label:'瑞金路下行首班',   factoryTrain:'032001', factoryDepot:'安顺车辆段',   factoryTime:'04:58:27', departTime:'05:30:00' },
+    { depot:'安顺',   trainNo:'181020', label:'青岛北站下行首班', factoryTrain:'182011', factoryDepot:'安顺车辆段',   factoryTime:'05:24:32', departTime:'05:30:00' },
+    { depot:'安顺',   trainNo:'202013', label:'青岛北站上行首班', factoryTrain:'202013', factoryDepot:'安顺车辆段',   factoryTime:'05:26:47', departTime:'05:30:00' },
+    // 瓦屋庄停车场
+    { depot:'瓦屋庄', trainNo:'011015', label:'青岛站下行首班',   factoryTrain:'011001', factoryDepot:'瓦屋庄停车场', factoryTime:'04:56:27', departTime:'05:30:00' },
+    { depot:'瓦屋庄', trainNo:'022014', label:'王家港上行首班',   factoryTrain:'021002', factoryDepot:'瓦屋庄停车场', factoryTime:'04:57:39', departTime:'05:30:00' },
+    { depot:'瓦屋庄', trainNo:'112008', label:'青岛站上行首班',   factoryTrain:'111007', factoryDepot:'瓦屋庄停车场', factoryTime:'05:11:48', departTime:'05:30:00' }
   ],
   last: [
     { station:'东郭庄', trainNo:'291210', type:'全程',   endStation:'王家港' },
@@ -357,12 +363,6 @@ var STATION_LABELS = { '东郭庄':'东郭庄轮值', '王家港':'王家港轮�
 var mode = 'first';
 var currentDepot = '瓦屋庄';
 var currentStation = '东郭庄';
-var currentRole = '瓦屋庄派班员';
-
-function switchRole(role) {
-  currentRole = role;
-  toast('已切换至：' + role);
-}
 
 function switchTimetable(key) {
   loadTT(key);
@@ -428,8 +428,8 @@ function renderFirst() {
     var dir = train ? (train.dir === 1 ? '下行' : '上行') : '--';
     var dirCls = dir === '下行' ? 'down' : 'up';
     var dirText = dir === '下行' ? '▼下行' : '▲上行';
-    var depart = ttDepart(t.trainNo);
-    var factoryTime = ttDepart(t.factoryTrain);
+    var depart = t.departTime || ttDepart(t.trainNo);
+    var factoryTime = t.factoryTime || ttDepart(t.factoryTrain);
     var startStation = ttStart(t.trainNo);
     return '<div class="reminder-card">' +
       '<div class="rc-top">' +
@@ -445,6 +445,7 @@ function renderFirst() {
         '<div><span>出厂时间</span> <strong>' + factoryTime + '</strong></div>' +
         '<div><span>出厂车厂</span> <strong>' + t.factoryDepot + '</strong></div>' +
       '</div>' +
+      '<div class="rc-actions"><button class="btn btn-preview" onclick="event.stopPropagation();playPreview(\'' + t.trainNo + '\')">🔊 试听</button></div>' +
     '</div>';
   }).join('');
 }
@@ -481,7 +482,7 @@ function renderLast() {
     var dir = train ? (train.dir === 1 ? '下行' : '上行') : '--';
     var dirCls = dir === '下行' ? 'down' : 'up';
     var dirText = dir === '下行' ? '▼下行' : '▲上行';
-    var depart = ttDepart(t.trainNo);
+    var depart = t.departTime || ttDepart(t.trainNo);
     var startStation = ttStart(t.trainNo);
     var typeTag = t.type === '全程' ? 'full' : 'partial';
     var endStationName = t.type === '全程' ? ttEnd(t.trainNo) : t.endStation;
@@ -498,6 +499,7 @@ function renderLast() {
         '<div><span>终到站</span> <strong>' + endStationName + '站</strong></div>' +
         '<div><span>类型</span> <strong style="color:' + (t.type==='全程' ? '#b464ff' : '#ff5252') + '">' + t.type + '末班车</strong></div>' +
       '</div>' +
+      '<div class="rc-actions"><button class="btn btn-preview" onclick="event.stopPropagation();playPreview(\'' + t.trainNo + '\')">🔊 试听</button></div>' +
     '</div>';
   }).join('');
 }
@@ -543,7 +545,7 @@ function renderSkip() {
     var dir = train ? (train.dir === 1 ? '下行' : '上行') : '--';
     var dirCls = dir === '下行' ? 'down' : 'up';
     var dirText = dir === '下行' ? '▼下行' : '▲上行';
-    var depart = ttDepart(t.trainNo);
+    var depart = t.departTime || ttDepart(t.trainNo);
     var endTime = t.depotTime || ttStationTime(t.trainNo, t.endDepot.replace('车辆段','').replace('停车场',''), 'a');
     var pickupTime = ttStationTime(t.pickupTrain, t.pickupAt, 'a');
     var startStation = ttStart(t.trainNo);
@@ -561,6 +563,7 @@ function renderSkip() {
         '<div><span>发车时间</span> <strong>' + depart + '</strong></div>' +
         '<div><span>回厂时间</span> <strong>' + endTime + '</strong></div>' +
       '</div>' +
+      '<div class="rc-actions"><button class="btn btn-preview" onclick="event.stopPropagation();playPreview(\'' + t.trainNo + '\')">🔊 试听</button></div>' +
     '</div>';
   }).join('');
 
@@ -577,29 +580,108 @@ function renderSkip() {
 var spokenAlerts = new Set();
 var voiceEnabled = true;
 
+function tnSpoken(tno) {
+  var digMap = {'0':'洞','1':'幺','2':'两','3':'三','4':'四','5':'五','6':'六','7':'拐','8':'八','9':'玖'};
+  var p1 = tno.slice(0,2).split('').map(function(c){return digMap[c]||c;}).join('');
+  var p2 = tno.slice(2).split('').map(function(c){return digMap[c]||c;}).join('');
+  return p1 + ' ' + p2;
+}
+
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+  var toggle = document.getElementById('voiceToggle');
+  var status = document.getElementById('voiceStatus');
+  if (voiceEnabled) {
+    toggle.classList.add('on');
+    status.className = 'vt-status on';
+    status.textContent = '已开启';
+  } else {
+    toggle.classList.remove('on');
+    status.className = 'vt-status off';
+    status.textContent = '已关闭';
+  }
+}
+
+var selectedRole = 'none';
+
+function switchRole(role) {
+  selectedRole = role;
+  var badge = document.getElementById('roleBadge');
+  spokenAlerts = new Set();
+  
+  if (role === 'none') {
+    voiceEnabled = false;
+    document.getElementById('voiceToggle').classList.remove('on');
+    document.getElementById('voiceStatus').className = 'vt-status off';
+    document.getElementById('voiceStatus').textContent = '已关闭';
+    badge.className = 'role-badge none';
+    badge.textContent = '不触发语音';
+  } else {
+    voiceEnabled = true;
+    document.getElementById('voiceToggle').classList.add('on');
+    document.getElementById('voiceStatus').className = 'vt-status on';
+    document.getElementById('voiceStatus').textContent = '已开启';
+    badge.className = 'role-badge selected';
+    badge.textContent = '语音已激活';
+    
+    // Auto-switch to correct mode and tab
+    if (role === '瓦屋庄派班' || role === '东郭庄派班' || role === '安顺派班') {
+      var depot = role.replace('派班','');
+      currentDepot = depot;
+      switchMode('first');
+      // Re-render will show the correct depot tab
+    } else if (role === '东郭庄轮值' || role === '王家港轮值') {
+      var station = role.replace('轮值','');
+      currentStation = station;
+      switchMode('last');
+    }
+  }
+}
+
 function sayText(text) {
   if (!voiceEnabled) return;
-  if (!text) return;
   var u = new SpeechSynthesisUtterance(text);
   u.lang = 'zh-CN'; u.rate = 0.85; u.pitch = 1.0;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
 }
 
-function toggleVoice(enabled) {
-  voiceEnabled = enabled;
+function forceSay(text) {
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN'; u.rate = 0.85; u.pitch = 1.0;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
 }
 
-function testVoice() {
-  if (!voiceEnabled) { toast('语音已关闭，请先开启'); return; }
-  var testMessages = [
-    '发车提醒，车次 011013，距发车还有 3 分钟',
-    '末班车提醒，2111 次全程末班车，还有 2 分钟发车',
-    '跳停回厂提醒，请关闭照明、关闭空调，门模式开关置 MM 位',
-  ];
-  var msg = testMessages[Math.floor(Math.random() * testMessages.length)];
-  toast('正在播放试听...');
-  sayText(msg);
+function playPreview(trainNo) {
+  var cfg = TRAIN_CONFIG[currentTT];
+  if (!cfg) return;
+  var tc = null;
+  if (mode === 'first') {
+    tc = (cfg.first || []).find(function(t){return t.trainNo===trainNo;});
+  } else if (mode === 'last') {
+    tc = (cfg.last || []).find(function(t){return t.trainNo===trainNo;});
+  } else {
+    tc = (cfg.skip || []).find(function(t){return t.trainNo===trainNo;});
+  }
+  if (!tc) return;
+  var train = tmap[tc.trainNo];
+  var dir = train ? (train.dir===1?'下形':'上形') : '';
+  var tn = tnSpoken(tc.trainNo);
+  var text;
+  if (mode === 'first') {
+    var station = tc.label.replace('下行首班','').replace('上行首班','');
+    text = station + dir + '首班车' + tn + '次即将发车，请派班员做好发车提醒';
+  } else if (mode === 'last') {
+    var station = tc.station;
+    var fullText = tc.type==='全程'?'全程':'非全程';
+    text = station + dir + fullText + '末班车' + tn + '次即将发车，请' + station + '轮值做好提醒';
+  } else {
+    var depot = tc.endDepot.replace('车辆段','').replace('停车场','');
+    var station = tc.station;
+    text = depot + '高峰跳停回厂车' + tn + '次即将接车，请' + station + '轮值做好接车提醒';
+  }
+  forceSay(text);
 }
 
 // ============ COUNTDOWN ============
@@ -619,6 +701,7 @@ function updateCountdown() {
   if (!hasConfig()) { timeEl1.textContent = '--:--:--'; return; }
 
   var targets = [];
+  var speechTargets = [];
   if (mode === 'first') {
     targets = [{ h:5, m:30, s:0 }];
     label1.textContent = '距发车';
@@ -628,12 +711,23 @@ function updateCountdown() {
     label1.textContent = '全程';
     label2.style.display = 'inline';
     timeEl2.style.display = 'inline';
-    if (currentStation === '东郭庄') {
-      targets = [{ h:22, m:3, s:0 }, { h:22, m:45, s:0 }];
-    } else {
-      targets = [{ h:22, m:18, s:0 }, { h:22, m:35, s:0 }];
-    }
     label2.textContent = '非全程';
+    var lastCfg = TRAIN_CONFIG[currentTT];
+    var lastTrains = lastCfg && lastCfg.last ? lastCfg.last.filter(function(t){return t.station===currentStation;}) : [];
+    for (var j = 0; j < lastTrains.length; j++) {
+      var bt = ttStationTime(lastTrains[j].trainNo, currentStation, 'b');
+      if (bt && bt !== '--:--:--') {
+        var bparts = bt.split(':');
+        targets.push({ h: parseInt(bparts[0]), m: parseInt(bparts[1]), s: parseInt(bparts[2]) });
+      }
+      var at = ttStationTime(lastTrains[j].trainNo, currentStation, 'a');
+      if (at && at !== '--:--:--') {
+        var aparts = at.split(':');
+        speechTargets.push({ h: parseInt(aparts[0]), m: parseInt(aparts[1]), s: parseInt(aparts[2]) });
+      }
+    }
+    if (targets.length === 0) targets = [{ h:0, m:0, s:0 }];
+    if (speechTargets.length === 0) speechTargets = targets;
   } else {
     label2.style.display = 'none';
     timeEl2.style.display = 'none';
@@ -680,35 +774,59 @@ function updateCountdown() {
   timeEl2.classList.remove('urgent-yellow','urgent-red');
   
   if (minLeft === Infinity || minLeft < 0) { statusEl.textContent = '今日已过'; return; }
+
+  // Speech uses arrival time targets for末班车
+  var speechMinLeft = minLeft;
+  if (mode === 'last' && speechTargets.length > 0) {
+    speechMinLeft = Infinity;
+    for (var si = 0; si < speechTargets.length; si++) {
+      var st = speechTargets[si], starget = new Date(now);
+      starget.setHours(st.h, st.m, st.s, 0);
+      var sdiff = starget - now;
+      if (sdiff >= 0) speechMinLeft = Math.min(speechMinLeft, sdiff / 60000);
+    }
+  }
   
   if (minLeft <= 1) {
-    timeEl1.classList.add('urgent-red');
-    if (targets.length > 1 && timeEl2.textContent !== '已发车') timeEl2.classList.add('urgent-red');
+    timeEl1.classList.add('urgent-pulse');
+    if (targets.length > 1 && timeEl2.textContent !== '已发车') timeEl2.classList.add('urgent-pulse');
     statusEl.className = 'cd-status critical'; statusEl.textContent = '⚠ 紧急';
   } else if (minLeft <= 2) {
     timeEl1.classList.add('urgent-red');
     if (targets.length > 1 && timeEl2.textContent !== '已发车') timeEl2.classList.add('urgent-red');
     statusEl.className = 'cd-status critical'; statusEl.textContent = '⚠ 紧急';
-    if (Math.floor(minLeft) === 2) speakCurrent(minLeft);
+    if (Math.floor(speechMinLeft) === 2) speakCurrent(speechMinLeft);
   } else if (minLeft <= 3) {
     timeEl1.classList.add('urgent-yellow');
     if (targets.length > 1 && timeEl2.textContent !== '已发车') timeEl2.classList.add('urgent-yellow');
     statusEl.className = 'cd-status urgent'; statusEl.textContent = '⚡ 告警';
-    if (Math.floor(minLeft) === 3) speakCurrent(minLeft);
+    if (Math.floor(speechMinLeft) === 3) speakCurrent(speechMinLeft);
   } else {
     statusEl.className = 'cd-status normal'; statusEl.textContent = '就绪';
   }
   
   var cards = document.querySelectorAll('.reminder-card');
   for (var i = 0; i < cards.length; i++) {
-    cards[i].classList.remove('warn-yellow','warn-red');
-    if (minLeft <= 1) cards[i].classList.add('warn-red');
-    else if (minLeft <= 2) { cards[i].style.borderColor='rgba(255,50,50,.4)'; cards[i].style.background='rgba(255,50,50,.05)'; }
+    cards[i].classList.remove('warn-yellow','warn-red','warn-pulse');
+    if (minLeft < 0) cards[i].classList.add('done');
+    else if (minLeft <= 1) cards[i].classList.add('warn-pulse');
+    else if (minLeft <= 2) cards[i].classList.add('warn-red');
     else if (minLeft <= 3) cards[i].classList.add('warn-yellow');
   }
 }
 
+function roleMatches() {
+  if (selectedRole === 'none') return false;
+  if (selectedRole === '瓦屋庄派班') return mode === 'first' && currentDepot === '瓦屋庄';
+  if (selectedRole === '东郭庄派班') return mode === 'first' && currentDepot === '东郭庄';
+  if (selectedRole === '安顺派班') return mode === 'first' && currentDepot === '安顺';
+  if (selectedRole === '东郭庄轮值') return currentStation === '东郭庄' && (mode === 'last' || mode === 'skip');
+  if (selectedRole === '王家港轮值') return currentStation === '王家港' && (mode === 'last' || mode === 'skip');
+  return false;
+}
+
 function speakCurrent(minutes) {
+  if (!roleMatches()) return;
   var cfg = TRAIN_CONFIG[currentTT];
   if (!cfg) return;
   var trains;
@@ -720,22 +838,21 @@ function speakCurrent(minutes) {
       if (spokenAlerts.has(key)) continue;
       spokenAlerts.add(key);
       var train = tmap[trains[i].trainNo];
-      var dir = train ? (train.dir === 1 ? '下行' : '上行') : '';
-      var digMap = {'0':'洞','1':'幺','2':'两','3':'三','4':'四','5':'五','6':'六','7':'拐','8':'八','9':'玖'};
-      var tnSpoken = trains[i].trainNo.split('').map(function(c) { return digMap[c] || c; }).join('');
+      var dir = train ? (train.dir === 1 ? '下形' : '上形') : '';
+      var tn = tnSpoken(trains[i].trainNo);
       if (mode === 'first') {
-        var station = trains[i].label.replace('首班','');
-        var text = station + dir + '首班车' + tnSpoken + '次即将发车，请派班员做好发车提醒';
+        var station = trains[i].label.replace('下行首班','').replace('上行首班','');
+        var text = station + dir + '首班车' + tn + '次即将发车，请派班员做好发车提醒';
         sayText(text);
       } else if (mode === 'last') {
         var station = trains[i].station;
         var fullText = trains[i].type === '全程' ? '全程' : '非全程';
-        var text = station + dir + fullText + '末班车' + tnSpoken + '次即将发车，请' + station + '轮值做好提醒';
+        var text = station + dir + fullText + '末班车' + tn + '次即将发车，请' + station + '轮值做好发车提醒';
         sayText(text);
       } else {
         var depot = trains[i].endDepot.replace('车辆段','').replace('停车场','');
         var station = trains[i].station;
-        var text = depot + '高峰跳停回厂车' + tnSpoken + '次即将接车，请' + station + '轮值做好接车提醒';
+        var text = depot + '高峰跳停回厂车' + tn + '次即将接车，请' + station + '轮值做好接车提醒';
         sayText(text);
       }
   }
