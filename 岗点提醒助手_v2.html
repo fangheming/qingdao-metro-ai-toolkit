@@ -78,6 +78,20 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.3);color:#4caf50;padding:10px 24px;border-radius:8px;font-size:15px;z-index:999;animation:toastIn .3s}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .warn-box{padding:16px 18px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.12);border-radius:8px;margin-bottom:14px;font-size:16px;color:rgba(255,255,255,.5);text-align:center}
+.control-bar{display:flex;align-items:center;gap:16px;margin-bottom:14px;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;flex-wrap:wrap}
+.ctrl-group{display:flex;align-items:center;gap:8px}
+.ctrl-group label{font-size:12px;color:rgba(255,255,255,.4);white-space:nowrap}
+.ctrl-group select{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 10px;color:#fff;font-size:13px;font-family:inherit;cursor:pointer}
+.ctrl-group select option{background:#1a1a2e;color:#fff}
+.toggle-switch{position:relative;display:inline-block;width:44px;height:24px;cursor:pointer}
+.toggle-switch input{display:none}
+.toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.15);border-radius:12px;transition:.3s}
+.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle-switch input:checked+.toggle-slider{background:#00e6b4}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(20px)}
+.btn-test{padding:8px 16px;background:rgba(0,230,180,.1);border:1px solid rgba(0,230,180,.2);border-radius:8px;color:#00e6b4;font-size:13px;font-family:inherit;cursor:pointer;transition:all .2s}
+.btn-test:hover{background:rgba(0,230,180,.2)}
+.btn-test:active{transform:scale(.96)}
 </style>
 </head>
 <body>
@@ -106,6 +120,27 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
   <button class="mode-btn" id="btnSkip" onclick="switchMode('skip')">
     <span class="mode-icon">🏃</span><span class="mode-label">跳停回厂</span>
   </button>
+</div>
+
+<div class="control-bar">
+  <div class="ctrl-group">
+    <label>岗位</label>
+    <select id="roleSelect" onchange="switchRole(this.value)">
+      <option value="瓦屋庄派班员">瓦屋庄派班员</option>
+      <option value="东郭庄派班员">东郭庄派班员</option>
+      <option value="安顺派班员">安顺派班员</option>
+      <option value="东郭庄轮值">东郭庄轮值</option>
+      <option value="王家港轮值">王家港轮值</option>
+    </select>
+  </div>
+  <div class="ctrl-group">
+    <label>语音提醒</label>
+    <label class="toggle-switch">
+      <input type="checkbox" id="voiceToggle" checked onchange="toggleVoice(this.checked)">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+  <button class="btn-test" onclick="testVoice()">🔊 试听</button>
 </div>
 
 <div id="infoBanner" style="display:none;padding:14px 18px;background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.15);border-radius:8px;margin-bottom:14px;font-size:14px">
@@ -322,6 +357,12 @@ var STATION_LABELS = { '东郭庄':'东郭庄轮值', '王家港':'王家港轮�
 var mode = 'first';
 var currentDepot = '瓦屋庄';
 var currentStation = '东郭庄';
+var currentRole = '瓦屋庄派班员';
+
+function switchRole(role) {
+  currentRole = role;
+  toast('已切换至：' + role);
+}
 
 function switchTimetable(key) {
   loadTT(key);
@@ -534,12 +575,31 @@ function renderSkip() {
 
 // ============ SPEECH ============
 var spokenAlerts = new Set();
+var voiceEnabled = true;
 
 function sayText(text) {
+  if (!voiceEnabled) return;
+  if (!text) return;
   var u = new SpeechSynthesisUtterance(text);
   u.lang = 'zh-CN'; u.rate = 0.85; u.pitch = 1.0;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
+}
+
+function toggleVoice(enabled) {
+  voiceEnabled = enabled;
+}
+
+function testVoice() {
+  if (!voiceEnabled) { toast('语音已关闭，请先开启'); return; }
+  var testMessages = [
+    '发车提醒，车次 011013，距发车还有 3 分钟',
+    '末班车提醒，2111 次全程末班车，还有 2 分钟发车',
+    '跳停回厂提醒，请关闭照明、关闭空调，门模式开关置 MM 位',
+  ];
+  var msg = testMessages[Math.floor(Math.random() * testMessages.length)];
+  toast('正在播放试听...');
+  sayText(msg);
 }
 
 // ============ COUNTDOWN ============
