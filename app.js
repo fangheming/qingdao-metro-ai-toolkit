@@ -21,19 +21,9 @@ var currentKey='Z01152',currentTrain=null,currentCurIdx=-2;
 
 function loadData(key){
   currentKey=key;
-  var d=getTTData(key);
-  if(!d||!d.trains||!d.stations){
-    console.error('数据加载失败:',key);
-    trains=[];stIdx={};trainMap={};
-    window.STATIONS=[];
-    document.getElementById('results').innerHTML='<div class="placeholder"><div class="ph-icon">⚠️</div>时刻表 '+key+' 数据加载失败，请刷新页面</div>';
-    return;
-  }
+  var d=key==='Z01152'?Z01152_DATA:Z01647_DATA;
   trains=d.trains;stIdx=d.stations;trainMap={};
-  for(var i=0;i<trains.length;i++){
-    var t=trains[i];
-    if(t&&t.no)trainMap[t.no]=t;
-  }
+  for(var i=0;i<trains.length;i++)trainMap[trains[i].no]=trains[i];
   window.STATIONS=Object.keys(stIdx).sort();
 }
 
@@ -43,15 +33,13 @@ function nowFull(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth(
 
 function findTrain(no){
   no=(no||'').trim();if(!no)return null;
-  if(!trains||!trains.length){console.warn('trains not loaded');return null;}
-  if(no.length===6){var t=trainMap[no];if(t)return t;for(var i=0;i<trains.length;i++)if(trains[i]&&trains[i].no===no)return trains[i];return null}
-  if(no.length===4){var m=[];for(var i=0;i<trains.length;i++){var ti=trains[i];if(ti&&ti.no&&ti.no.slice(-4)===no)m.push(ti)}if(m.length===1)return m[0];if(m.length>1)return m;return null}
+  var wd=no.length===6?+no[2]:(no.length===4?+no[0]:0);
+  if(no.length===6){var t=trainMap[no];if(t)return t;for(var i=0;i<trains.length;i++)if(trains[i].no===no)return trains[i];return null}
+  if(no.length===4){var m=[];for(var i=0;i<trains.length;i++){var tn=trains[i].no;if(tn.slice(-4)===no&&(!wd||(tn.length===6?+tn[2]:+tn[0])===wd))m.push(trains[i])}if(m.length===1)return m[0];if(m.length>1)return m}
   return trainMap[no]||null;
 }
 
 function computePos(t){
-  if(!t||!t.stations||!t.stations.length)return {ci:-1,pos:'无站点数据'};
-  try{
   var ns=t2s(nowStr()),pos='',ci=-1,bw=false,bf=-1;
   for(var i=0;i<t.stations.length;i++){
     var s=t.stations[i],a=t2s(s.a),b=t2s(s.b);
@@ -80,12 +68,9 @@ function computePos(t){
     }
   }
   if(ci===-1)pos='时间不在运行范围内';return{pos:pos,ci:ci,bw:bw,bf:bf};
-  }catch(e){return {ci:-1,pos:'解析错误'};}
 }
 
 function buildTrainView(t,cp){
-  try{
-  if(!t||!t.stations||!t.stations.length){document.getElementById('results').innerHTML='<div class="placeholder">该车次无站点数据<br><span style="font-size:12px;color:rgba(255,255,255,.3)">车次: '+ (t?t.no:'?') +'</span></div>';return;}
   var d=t.dir===1?'下行':'上行',dc=t.dir===1?'d':'u',ar=t.routes&&t.routes.length?t.routes[0]:'';
   if(cp.ci>=0&&t.stations)for(var i=Math.min(Math.floor(cp.ci),t.stations.length-1);i>=0;i--)if(t.stations[i].route){ar=t.stations[i].route;break}
   var h='<div class="rstatus" id="rstatus">'+nowStr()+' · '+currentKey+'</div>';
@@ -97,12 +82,11 @@ function buildTrainView(t,cp){
   if(cp.bw&&cp.bf>=0)duty=getDutyArea(t.stations[cp.bf].n);
   else if(cp.ci>=0&&cp.ci===Math.floor(cp.ci)&&cp.ci<t.stations.length)duty=getDutyArea(t.stations[cp.ci].n);
   if(duty)h+='<div class="tc-pos"><span class="pdim">属地：</span><span class="pval" style="color:#f0c040">'+duty+'</span></div>';
-  var stCount=t.stations?t.stations.length:0;
-  h+='<div class="tc-pos"><span class="pdim">路径：</span>'+t.start+' <span class="pval">→</span> '+t.end+' · '+stCount+'站</div>';
+  h+='<div class="tc-pos"><span class="pdim">路径：</span>'+t.start+' <span class="pval">→</span> '+t.end+' · '+t.stations.length+'站</div>';
   if(t.routes&&t.routes.length>1){h+='<div class="tc-pos"><span class="pdim">全部交路：</span>';for(var i=0;i<t.routes.length;i++)h+='<span class="route-tag">'+t.routes[i]+'</span>';if(t.pickup)h+=' <span class="route-tag" style="background:rgba(64,180,255,.2);color:#4ab8ff;border-color:rgba(64,180,255,.3)">'+t.pickup+'接</span>';h+=' <span style="color:rgba(255,255,255,.3);font-size:11px">'+t.drivers+'位司机</span></div>'}
   else if(t.pickup){h+='<div class="tc-pos"><span class="pdim">接车：</span><span class="route-tag" style="background:rgba(64,180,255,.2);color:#4ab8ff;border-color:rgba(64,180,255,.3)">'+t.pickup+'接</span></div>'}
   h+='</div><div class="timeline">';
-  if(t.stations)for(var i=0;i<t.stations.length;i++){
+  for(var i=0;i<t.stations.length;i++){
     var s=t.stations[i],cls='tl-row';
     if(cp.ci>=0&&i<Math.floor(cp.ci))cls+=' passed';else if((cp.bw&&i===cp.bf)||i===cp.ci)cls+=' current';else if(cp.ci>=0&&i>cp.ci)cls+=' upcoming';
     var ts='';if(!s.a&&s.b)ts='通过 '+s.b;else if(s.a&&!s.b)ts='通过 '+s.a;else if(s.a&&s.b)ts='到 '+s.a+' 发 '+s.b;
@@ -111,7 +95,6 @@ function buildTrainView(t,cp){
   }
   h+='</div>';document.getElementById('results').innerHTML=h;
   if(cp.ci>=0&&cp.ci<t.stations.length){var el=document.querySelector('.tl-row.current');if(el)el.scrollIntoView({block:'start'})}
-  }catch(e){document.getElementById('results').innerHTML='<div style="color:red;padding:20px">ERROR: '+e.message+'</div>';}
 }
 
 function showTrain(t){var cp=computePos(t);if(cp.ci!==currentCurIdx){currentCurIdx=cp.ci;buildTrainView(t,cp)}else{var st=document.getElementById('rstatus');if(st)st.textContent=nowStr()+' · '+currentKey;var pt=document.getElementById('posText');if(pt)pt.textContent=cp.pos}}
@@ -129,14 +112,10 @@ function queryByTrain(input){
 
 function queryByStation(st){
   st=st||document.getElementById('sName').value.trim();if(!st)return;var dir=+document.getElementById('sDir').value,ts=stIdx[st]||[],results=[];
-  for(var i=0;i<ts.length;i++){var t=trainMap[ts[i]];if(!t)continue;if(dir&&t.dir!==dir)continue;var cp=computePos(t);var noStations=!t.stations||!t.stations.length;
-    if(!noStations&&(cp.ci<0||cp.ci>=t.stations.length))continue;
-    var m=false,mt='';
-    if(noStations){m=true;mt='经由';}
-    else{var ici=Math.floor(cp.ci);
+  for(var i=0;i<ts.length;i++){var t=trainMap[ts[i]];if(!t)continue;if(dir&&t.dir!==dir)continue;var cp=computePos(t);if(cp.ci<0||cp.ci>=t.stations.length)continue;var m=false,mt='',ici=Math.floor(cp.ci);
     if(cp.ci===ici&&t.stations[cp.ci].n===st){m=true;mt='停靠'}else if(cp.bw&&t.stations[cp.bf].n===st){m=true;mt='刚离开'}else if(cp.bw&&cp.bf+1<t.stations.length&&t.stations[cp.bf+1].n===st){m=true;mt='即将到达'}else if(cp.ci===ici&&cp.ci+1<t.stations.length&&t.stations[cp.ci+1].n===st){m=true;mt='下一站'}
-    }if(m)results.push({train:t,type:mt,cp:cp})}
-  if(!results.length){document.getElementById('results').innerHTML='<div class="placeholder"><div class="ph-icon">🚉</div>当前时刻无列车在 '+st+'<br><span style="font-size:12px;color:rgba(255,255,255,.3)">该站共 '+ts.length+' 趟列车，当前不在运行时段</span></div>';return}
+    if(m)results.push({train:t,type:mt,cp:cp})}
+  if(!results.length){document.getElementById('results').innerHTML='<div class="placeholder">当前没有列车在 '+st+'</div>';return}
   currentTrain=null;var h='<div class="rstatus">'+st+' · 当前 '+results.length+' 趟列车</div>';
   for(var i=0;i<results.length;i++){var r=results[i],t=r.train;h+='<div class="st-card" data-tn="'+t.no+'"><span class="st-dir '+(t.dir===1?'d':'u')+'">'+(t.dir===1?'下行':'上行')+'</span> <span style="color:#00e6b4;font-size:14px;font-weight:600">'+t.no+'</span><span style="color:rgba(255,255,255,.3);font-size:11px;margin-left:8px">'+r.type+'</span><div class="st-info">'+t.start+' → '+t.end+' · '+r.cp.pos+'</div></div>'}
   document.getElementById('results').innerHTML=h
@@ -150,7 +129,7 @@ document.getElementById('tNo').addEventListener('keydown',function(e){if(e.key==
 document.getElementById('sName').addEventListener('keydown',function(e){if(e.key==='Enter'){document.getElementById('sList').classList.remove('show');queryByStation()}});
 document.getElementById('ttSelect').addEventListener('change',function(){currentTrain=null;loadData(this.value);document.getElementById('results').innerHTML='<div class="placeholder"><div class="ph-icon">[OK]</div>已切换时刻表</div>'});
 setInterval(function(){document.getElementById('liveClock').textContent=nowFull();if(currentTrain)showTrain(currentTrain)},1000);
-populateTTSelect('Z01152');loadData('Z01152');document.getElementById('liveClock').textContent=nowFull();
+loadData('Z01152');document.getElementById('liveClock').textContent=nowFull();
 
 // Export to window for onclick handlers
 window.queryByTrain=queryByTrain;

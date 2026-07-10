@@ -1,8 +1,7 @@
-var CACHE_NAME = 'train-locator-v4';
+var CACHE_NAME = 'train-locator-v3-1';
 var FILES = [
   '/列车定位助手_v3.html',
   '/app.js',
-  '/timetable-registry.js',
   '/Z01152_data.js',
   '/Z01647_data.js',
   '/manifest.json',

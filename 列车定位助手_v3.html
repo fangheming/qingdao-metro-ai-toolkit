@@ -70,7 +70,7 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
 <body>
 <div class="container">
 <div class="header"><div class="badge">乘务专业AI工具集</div><h1>列车定位助手</h1><div class="sub">精确车次查询 · 车站模糊定位</div></div>
-<div class="top-bar"><span class="tb-label">时刻表</span><select id="ttSelect"></select><span class="tb-current" id="liveClock">--:--:--</span></div>
+<div class="top-bar"><span class="tb-label">时刻表</span><select id="ttSelect"><option value="Z01152">Z01152 · 工作日</option><option value="Z01647">Z01647 · 周末</option></select><span class="tb-current" id="liveClock">--:--:--</span></div>
 <div class="qf"><div class="qf-row">
 <div class="qf-group" style="max-width:200px"><label>车次号</label><input type="text" id="tNo" placeholder="如 211034" autocomplete="off"></div>
 <div class="qf-group suggest-wrap" style="flex:2;min-width:160px"><label>车站名称</label><input type="text" id="sName" placeholder="如 台东" autocomplete="off"><div class="suggest-list" id="sList"></div></div>
@@ -81,8 +81,7 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
 </div>
 <script src="Z01152_data.js"></script>
 <script src="Z01647_data.js"></script>
-<script src="timetable-registry.js"></script>
-<script src="app.js?v=7"></script>
+<script src="app.js"></script>
 <script>
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').then(function(){

@@ -67,7 +67,7 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
 <body>
 <div class="container">
 <div class="header"><div class="badge">乘务专业AI工具集 · v2</div><h1>✅ 覆盖检查助手</h1><div class="sub">列车预告 · 逐车标记 · 台账导出 · 双时刻表</div></div>
-<div class="top-bar"><span class="tb-label">📅 时刻表</span><select id="ttSelect"></select><span style="flex:1;"></span><span class="tb-label">🕐 当前时间</span><span class="tb-current" id="liveClock">--:--:--</span></div>
+<div class="top-bar"><span class="tb-label">📅 时刻表</span><select id="ttSelect"><option value="Z01152">Z01152 · 工作日</option><option value="Z01647">Z01647 · 周末</option></select><span style="flex:1;"></span><span class="tb-label">🕐 当前时间</span><span class="tb-current" id="liveClock">--:--:--</span></div>
 <div class="qf"><div class="qf-row"><div class="qf-group suggest-wrap" style="flex:2;min-width:140px;"><label>检查车站</label><input type="text" id="sName" placeholder="输入站名" autocomplete="off"><div class="suggest-list" id="sList"></div></div><div class="qf-group" style="max-width:130px;"><label>方向</label><select id="sDir"><option value="0">不限</option><option value="1">下行（北→南）</option><option value="2">上行（南→北）</option></select></div><div class="qf-group" style="max-width:90px;"><label>范围</label><select id="sMode" onchange="document.getElementById('sVal').placeholder=this.value==='trains'?'趟数':'分钟'"><option value="trains">按趟数</option><option value="minutes">按分钟</option></select></div><div class="qf-group" style="max-width:70px;"><label>数量</label><input type="number" id="sVal" value="10" min="1" max="100" placeholder="趟数"></div><button class="btn btn-p" id="btnQ">开始检查</button></div><div class="qf-row" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04)"><div class="qf-group" style="max-width:140px;"><label>检查车次</label><input type="text" id="checkTrain" placeholder="车次号或下拉选择" list="trainList" autocomplete="off"><datalist id="trainList"></datalist></div><div class="qf-group" style="max-width:200px;"><label>检查项目</label><select id="checkItem"><option value="">选择项目</option><option value="PSL遮挡测试">PSL遮挡测试</option><option value="夹物测试">夹物测试</option><option value="门选测试">门选测试</option><option value="主控手柄测试">主控手柄测试</option></select></div><div class="qf-group" style="max-width:110px;"><label>是否通过</label><select id="isPass"><option value="">-</option><option value="是">是</option><option value="否">否</option></select></div><div class="qf-group" style="flex:2;"><label>补充信息</label><input type="text" id="extraInfo" placeholder="如：班次、检查人等" autocomplete="off"></div></div></div>
 <div id="results"><div class="empty"><div class="ph-icon">✅</div>选择车站和方向，查看即将经过的列车并逐车标记</div></div>
 </div>
@@ -77,7 +77,6 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
 </script>
 <script src="Z01152_data.js"></script>
 <script src="Z01647_data.js"></script>
-<script src="timetable-registry.js"></script>
 <script>
 var trains=[],tIdx={},stIdx={},allStations=[],checkedMap={},currentResults=[];
 
@@ -89,7 +88,7 @@ function loadTT(key){
   var r=document.getElementById('results');
   r.innerHTML='<div class="loading"><div class="spinner"></div></div>';
   try{
-    var raw=getTTData(key);
+    var raw=key==='Z01152'?Z01152_DATA:Z01647_DATA;
     if(!raw||!raw.trains)throw new Error('load failed');
     trains=raw.trains.map(function(t){return{trainNo:t.no,direction:t.dir===1?'下行':'上行',directionCode:t.dir,schedule:t.stations.map(function(s){return{station:s.n,arrival:s.a||null,departure:s.b||null}}),stationCount:t.stations.length}});
     var ss=new Set();
@@ -196,7 +195,7 @@ sEl.addEventListener('input',function(){var v=sEl.value.trim();if(!v){sList.clas
 sList.addEventListener('click',function(e){if(e.target.tagName==='DIV'){sEl.value=e.target.textContent;sList.classList.remove('show')}});
 document.addEventListener('click',function(e){if(!sEl.parentElement.contains(e.target))sList.classList.remove('show')});
 document.getElementById('ttSelect').addEventListener('change',function(){loadTT(this.value)});
-populateTTSelect('Z01152');loadTT('Z01152');
+loadTT('Z01152');
 </script>
 </body>
 </html>

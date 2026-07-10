@@ -111,6 +111,8 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
 <div class="tt-switch">
   <label>时刻表</label>
   <select id="ttSelect" onchange="switchTimetable(this.value)">
+    <option value="Z01152" selected>Z01152（工作日）</option>
+    <option value="Z01647">Z01647（周末）</option>
   </select>
   <span class="tt-badge active" id="ttBadge">数据就绪</span>
 </div>
@@ -178,7 +180,6 @@ body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;backg
 <!-- Timetable data files -->
 <script src="Z01152_data.js"></script>
 <script src="Z01647_data.js"></script>
-<script src="timetable-registry.js"></script>
 
 <script>
 // ============ TIMETABLE ENGINE ============
@@ -188,7 +189,7 @@ let tmap = {};        // trainNo → train object
 
 function loadTT(key) {
   currentTT = key;
-  TT = getTTData(key);
+  TT = key === 'Z01152' ? Z01152_DATA : Z01647_DATA;
   tmap = {};
   for (var i = 0; i < TT.trains.length; i++) {
     tmap[TT.trains[i].no] = TT.trains[i];
@@ -869,7 +870,7 @@ function showToast(msg) {
 }
 
 // ============ INIT ============
-populateTTSelect('Z01152');loadTT('Z01152');
+loadTT('Z01152');
 setInterval(updateCountdown, 1000);
 updateCountdown();
 render();
