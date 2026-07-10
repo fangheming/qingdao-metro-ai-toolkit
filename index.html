@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>乘务专业AI工具集</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#120a1e 0%,#1a102e 30%,#221540 60%,#120a1e 100%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.container{max-width:780px;padding:40px 20px;text-align:center}
+h1{font-size:32px;font-weight:900;background:linear-gradient(135deg,#fa0,#f80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.sub{font-size:14px;color:rgba(255,255,255,.35);margin-bottom:32px}
+.scenes{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+.scene-col{border-radius:14px;padding:20px;text-align:left}
+.scene-col h3{font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.scene-fault{background:rgba(255,82,82,.03);border:1px solid rgba(255,82,82,.1)}
+.scene-fault h3{color:#ff5252}
+.scene-daily{background:rgba(74,222,128,.03);border:1px solid rgba(74,222,128,.1)}
+.scene-daily h3{color:#4ade80}
+.tools{display:flex;flex-direction:column;gap:10px}
+.tool-card{display:block;padding:16px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;text-decoration:none;color:#fff;transition:all .2s}
+.tool-card:hover{background:rgba(255,255,255,.06)}
+.tool-card h2{font-size:17px;font-weight:700;margin-bottom:2px}
+.tool-card p{font-size:12px;color:rgba(255,255,255,.4)}
+.tool-card .tag{display:inline-block;background:rgba(76,175,80,.1);color:#4caf50;font-size:10px;padding:2px 7px;border-radius:4px;margin-top:6px}
+.tool-card .badge{display:inline-block;background:rgba(180,100,255,.1);color:#b464ff;font-size:10px;padding:2px 7px;border-radius:4px;margin-top:6px;margin-left:4px}
+.footer{font-size:12px;color:rgba(255,255,255,.2);margin-top:32px}
+@media(max-width:600px){.scenes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🚇 乘务专业AI工具集</h1>
+<div class="sub">青岛地铁运营有限公司 · 乘务专业</div>
+<div style="margin-bottom:24px"><a href="产品介绍.html" style="color:rgba(255,170,0,.7);text-decoration:none;font-size:13px;border-bottom:1px dashed rgba(255,170,0,.3);padding-bottom:2px;">📋 查看产品介绍</a></div>
+
+<div class="scenes">
+  <div class="scene-col scene-fault">
+    <h3>⚠️ 故障场景</h3>
+    <div class="tools">
+      <a href="列车定位助手_v3.html" class="tool-card">
+        <h2>📍 列车定位助手 v3</h2>
+        <p>实时掌握列车位置、交路切换、车次查询</p>
+        <span class="tag">已上线</span> <span class="badge">双时刻表</span>
+      </a>
+      <a href="添乘助手_v2.html" class="tool-card">
+        <h2>🚀 添乘助手 v2</h2>
+        <p>双向列车匹配 · 最快添乘路径推算</p>
+        <span class="tag">已上线</span> <span class="badge">双时刻表</span>
+      </a>
+      <a href="备车替换助手_v3.html" class="tool-card">
+        <h2>🚗 备车替换助手 v3</h2>
+        <p>故障车次 → 折返后车次 → 通知接车</p>
+        <span class="tag">已上线</span> <span class="badge">双时刻表</span>
+      </a>
+    </div>
+  </div>
+  <div class="scene-col scene-daily">
+    <h3>📋 日常场景</h3>
+    <div class="tools">
+      <a href="岗点提醒助手_v2.html" class="tool-card">
+        <h2>🔔 岗点提醒助手 v2</h2>
+        <p>首末班车、跳停回厂提醒 · 倒计时语音播报</p>
+        <span class="tag">已上线</span> <span class="badge">双时刻表</span>
+      </a>
+      <a href="覆盖检查助手_v2.html" class="tool-card">
+        <h2>✅ 覆盖检查助手 v2</h2>
+        <p>列车预告 · 逐车标记 · 台账导出</p>
+        <span class="tag">已上线</span> <span class="badge">双时刻表</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Powered by GitHub Pages</div>
+</div>
+</body>
+</html>

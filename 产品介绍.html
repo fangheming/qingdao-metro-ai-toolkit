@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>乘务专业AI工具集 - 产品介绍</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#120a1e 0%,#1a102e 30%,#221540 60%,#120a1e 100%);color:#fff;min-height:100vh}
+.container{max-width:1000px;margin:0 auto;padding:40px 20px}
+
+.header{text-align:center;padding:30px 0 40px;border-bottom:1px solid rgba(180,100,255,.08);margin-bottom:40px}
+.header .badge{display:inline-block;background:rgba(180,100,255,.1);border:1px solid rgba(180,100,255,.2);color:#b464ff;padding:6px 18px;border-radius:16px;font-size:13px;letter-spacing:2px;margin-bottom:16px}
+.header h1{font-size:36px;font-weight:900;background:linear-gradient(135deg,#fa0,#f80,#b464ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.header .sub{font-size:15px;color:rgba(255,255,255,.35)}
+.header .desc{font-size:14px;color:rgba(255,255,255,.5);margin-top:16px;line-height:1.8;max-width:700px;margin-left:auto;margin-right:auto}
+
+.tool-section{margin-bottom:48px}
+.tool-section h2{font-size:24px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.tool-section .tagline{font-size:14px;color:rgba(255,255,255,.3);margin-bottom:24px}
+
+/* Feature grid */
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:24px}
+.feature{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;transition:all .2s}
+.feature:hover{background:rgba(255,255,255,.05)}
+.feature .icon{font-size:28px;margin-bottom:8px}
+.feature h4{font-size:15px;font-weight:700;margin-bottom:4px}
+.feature p{font-size:13px;color:rgba(255,255,255,.45);line-height:1.6}
+
+/* Color themes per tool */
+.tool-train{--accent:#00e6b4}
+.tool-remind{--accent:#fa0}
+.tool-shift{--accent:#ff8800}
+
+.tool-section.tool-train h2{color:#00e6b4}
+.tool-section.tool-remind h2{color:#fa0}
+.tool-section.tool-shift h2{color:#ff8800}
+
+/* Specs table */
+.specs{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:20px;margin-top:16px}
+.specs h4{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:12px}
+.specs .spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+.specs .spec-item{font-size:13px;color:rgba(255,255,255,.6);display:flex;justify-content:space-between}
+.specs .spec-item span:last-child{color:rgba(255,255,255,.85);font-weight:500}
+
+/* Scenario box */
+.scenario{margin-top:20px;padding:16px 20px;border-radius:10px}
+.scenario h4{font-size:13px;margin-bottom:8px}
+.scenario ul{list-style:none;padding:0}
+.scenario ul li{font-size:13px;padding:4px 0;color:rgba(255,255,255,.55)}
+.scenario ul li::before{content:'▸ ';margin-right:6px}
+.tool-train .scenario{background:rgba(0,230,180,.05);border:1px solid rgba(0,230,180,.1)}
+.tool-train .scenario h4{color:#00e6b4}
+.tool-remind .scenario{background:rgba(255,170,0,.05);border:1px solid rgba(255,170,0,.1)}
+.tool-remind .scenario h4{color:#fa0}
+.tool-shift .scenario{background:rgba(255,136,0,.05);border:1px solid rgba(255,136,0,.1)}
+.tool-shift .scenario h4{color:#ff8800}
+.tool-check{--accent:#b464ff}
+.tool-section.tool-check h2{color:#b464ff}
+.tool-check .scenario{background:rgba(180,100,255,.05);border:1px solid rgba(180,100,255,.1)}
+.tool-check .scenario h4{color:#b464ff}
+
+.cta{text-align:center;padding:40px 0 20px}
+.cta a{display:inline-block;padding:14px 40px;background:linear-gradient(135deg,#b464ff,#fa0);border-radius:12px;color:#fff;text-decoration:none;font-size:16px;font-weight:700;letter-spacing:1px;transition:all .3s}
+.cta a:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(180,100,255,.2)}
+.footer{text-align:center;padding:20px;font-size:12px;color:rgba(255,255,255,.15)}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="badge">青岛地铁 1 号线 · 乘务专业 AI 工具集</div>
+  <h1>乘务专业 AI 工具集</h1>
+  <div class="sub">Z01152 工作日 / Z01647 周末 · 双时刻表覆盖</div>
+  <div class="desc">
+    面向青岛地铁 1 号线乘务专业日常工作场景，基于时刻表数据打造的三款 AI 辅助工具。<br>
+    覆盖列车定位追踪、岗点提醒播报、故障添乘决策三大核心需求。
+  </div>
+</div>
+
+<!-- 列车定位助手 -->
+<div class="tool-section tool-train">
+  <h2>📍 列车定位助手 v3</h2>
+  <div class="tagline">实时掌握全线列车运行位置、交路切换与车次查询</div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="icon">📊</div>
+      <h4>全线列车可视化</h4>
+      <p>44 个点位（41 站 + 3 场段）实时显示各车次位置，按方向/交路分组</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🔄</div>
+      <h4>交路切换标记</h4>
+      <p>自动标注海泊桥站交路交接点，显示交路号对应值乘关系</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🔍</div>
+      <h4>车次快速检索</h4>
+      <p>支持 6 位车次号精确查询，实时显示当前位置与详细时刻</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📅</div>
+      <h4>双时刻表切换</h4>
+      <p>Z01152 工作日 / Z01647 周末一键切换，覆盖 498+ 列次</p>
+    </div>
+  </div>
+
+  <div class="specs">
+    <h4>技术规格</h4>
+    <div class="spec-grid">
+      <div class="spec-item"><span>覆盖线路</span><span>1 号线全线</span></div>
+      <div class="spec-item"><span>点位数量</span><span>44 个（41 站+3 场段）</span></div>
+      <div class="spec-item"><span>数据规模</span><span>498 列次/时刻表</span></div>
+      <div class="spec-item"><span>更新时间</span><span>实时推演</span></div>
+      <div class="spec-item"><span>交路标识</span><span>海泊桥站换班点</span></div>
+      <div class="spec-item"><span>PWA 支持</span><span>可安装到桌面</span></div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <h4>使用场景</h4>
+    <ul>
+      <li>派班员查看全线列车分布，掌握运行密度</li>
+      <li>调度确认某车次当前位置和预计到站时间</li>
+      <li>司机交接班时核对交路号和值乘关系</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 岗点提醒助手 -->
+<div class="tool-section tool-remind">
+  <h2>🔔 岗点提醒助手 v2</h2>
+  <div class="tagline">首末班车 · 跳停回厂 · 倒计时语音播报 · 岗位联动</div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="icon">🌅</div>
+      <h4>首班车提醒</h4>
+      <p>14 条首班车全覆盖，显示出厂车次、出厂时间、出厂车厂，按车厂/方向排列</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🌙</div>
+      <h4>末班车提醒</h4>
+      <p>全程/非全程末班车分开显示，倒计时用发车时间，语音按接车时间播报</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🏃</div>
+      <h4>跳停回厂提醒</h4>
+      <p>44 条跳停车含接车车次和回厂时间，已过车次灰度显示、自动滚到下一班</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🔊</div>
+      <h4>语音播报</h4>
+      <p>数字军用读法（洞幺两…），3 分钟/2 分钟自动播报，试听按钮不受开关限制</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🎯</div>
+      <h4>岗位选择</h4>
+      <p>3 车厂派班员 + 2 终点站轮值，选岗后只播报该岗位提醒，未选岗不触发语音</p>
+    </div>
+    <div class="feature">
+      <div class="icon">⚠️</div>
+      <h4>颜色预警</h4>
+      <p>距目标 >3min 正常 · ≤3min 黄色 · ≤2min 红色 · ≤1min 红色脉冲 · 已过灰色</p>
+    </div>
+  </div>
+
+  <div class="specs">
+    <h4>技术规格</h4>
+    <div class="spec-grid">
+      <div class="spec-item"><span>提醒总量</span><span>45 项（首班 14+末班 8+跳停 44 含去重）</span></div>
+      <div class="spec-item"><span>语音格式</span><span>地铁军用数字读法</span></div>
+      <div class="spec-item"><span>岗位角色</span><span>5 个岗位 + 未选择</span></div>
+      <div class="spec-item"><span>提醒时机</span><span>接车/发车时间 3+2 分钟</span></div>
+      <div class="spec-item"><span>数据来源</span><span>时刻表自动读取</span></div>
+      <div class="spec-item"><span>试听功能</span><span>独立播放不受开关限制</span></div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <h4>使用场景</h4>
+    <ul>
+      <li>派班员清早查看首班车出厂情况，提醒司机发车</li>
+      <li>终点站轮值晚间监控末班车接车时间</li>
+      <li>跳停车高峰时提前准备接车，提醒司机关灯关空调</li>
+      <li>选岗后挂机运行，到点自动语音提醒</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 添乘助手 -->
+<div class="tool-section tool-shift">
+  <h2>🚀 添乘助手 v2</h2>
+  <div class="tagline">双向列车匹配 · 最快添乘故障列车 · 跨区域协同</div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="icon">🔄</div>
+      <h4>对向拦截方案</h4>
+      <p>自动匹配对向列车拦截故障车，每车次列 2 个最佳拦截站，按最早发车排序</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📡</div>
+      <h4>实时位置推演</h4>
+      <p>输入车次后每秒刷新推演位置和属地，自动跟踪列车运行轨迹</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🏘️</div>
+      <h4>属地识别</h4>
+      <p>自动显示列车当前属地：东郭庄/兴国/海泊桥/山里/王家港</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🤝</div>
+      <h4>跨区域添乘</h4>
+      <p>选岗后若本站无法添乘，自动尝试下一属地跨区域拦截方案</p>
+    </div>
+    <div class="feature">
+      <div class="icon">👤</div>
+      <h4>岗位快速选择</h4>
+      <p>5 个岗位一键切换（3 轮值 + 2 派班），自动关联管辖区段</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📊</div>
+      <h4>三种方案优先级</h4>
+      <p>对向拦截 → 原地等候 → 无法添乘，层次清晰</p>
+    </div>
+  </div>
+
+  <div class="specs">
+    <h4>技术规格</h4>
+    <div class="spec-grid">
+      <div class="spec-item"><span>算法核心</span><span>双向列车匹配 + 区间推演</span></div>
+      <div class="spec-item"><span>属地划分</span><span>5 个管辖区段</span></div>
+      <div class="spec-item"><span>岗位角色</span><span>5 个岗位</span></div>
+      <div class="spec-item"><span>刷新频率</span><span>每秒实时更新</span></div>
+      <div class="spec-item"><span>拦截上限</span><span>每对向车次 2 站</span></div>
+      <div class="spec-item"><span>数据来源</span><span>时刻表自动读取</span></div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <h4>使用场景</h4>
+    <ul>
+      <li>故障列车出现时，轮值快速决策最快添乘路径</li>
+      <li>通过属地判断是否需要跨区域协调其他岗点</li>
+      <li>实时跟踪故障列车位置，动态调整添乘计划</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 覆盖检查助手 -->
+<div class="tool-section tool-check">
+  <h2>✅ 覆盖检查助手 v2</h2>
+  <div class="tagline">列车预告 · 逐车标记 · 台账导出</div>
+  <div class="features">
+    <div class="feature">
+      <div class="icon">📋</div>
+      <h4>列车预告清单</h4>
+      <p>选择车站后列出即将经过的所有列车，支持按趟数/分钟两种范围过滤</p>
+    </div>
+    <div class="feature">
+      <div class="icon">✅</div>
+      <h4>逐车标记</h4>
+      <p>点击即可标记已检查车次，已覆盖/待检查统计实时更新，已过不统计</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📊</div>
+      <h4>覆盖统计</h4>
+      <p>总计/已覆盖/待检查三栏统计，百分比一目了然</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📋</div>
+      <h4>台账导出</h4>
+      <p>一键生成覆盖检查日报，含检查项目/车次/是否通过/补充信息</p>
+    </div>
+  </div>
+  <div class="specs">
+    <h4>技术规格</h4>
+    <div class="spec-grid">
+      <div class="spec-item"><span>列车数量</span><span>498 列次/时刻表</span></div>
+      <div class="spec-item"><span>检查方式</span><span>按方向 + 按范围</span></div>
+      <div class="spec-item"><span>导出格式</span><span>纯文本日报一键复制</span></div>
+      <div class="spec-item"><span>数据来源</span><span>时刻表自动读取</span></div>
+    </div>
+  </div>
+  <div class="scenario">
+    <h4>使用场景</h4>
+    <ul>
+      <li>轮值/派班员按站逐车检查覆盖情况</li>
+      <li>检查项目（PSL遮挡、夹物、门选等）逐车追踪</li>
+      <li>生成日常检查日报，留存记录</li>
+    </ul>
+  </div>
+</div>
+
+<div class="cta">
+  <a href="index.html">🚇 进入工具集首页</a>
+</div>
+
+<div class="footer">青岛地铁运营有限公司 · 乘务专业 · AI 工具集</div>
+
+</div>
+</body>
+</html>

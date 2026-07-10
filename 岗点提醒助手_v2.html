@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>岗点提醒助手 v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#120a1e 0%,#1a102e 30%,#221540 60%,#120a1e 100%);color:#fff;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:20px 16px}
+.header{text-align:center;padding:20px 0 16px;border-bottom:1px solid rgba(180,100,255,.08);margin-bottom:18px}
+.header .badge{display:inline-block;background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.2);color:#fa0;padding:4px 14px;border-radius:12px;font-size:13px;letter-spacing:2px;margin-bottom:6px}
+.header h1{font-size:28px;font-weight:900;background:linear-gradient(135deg,#fa0,#f80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header .sub{font-size:13px;color:rgba(255,255,255,.35);margin-top:2px}
+.tt-switch{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;margin-bottom:14px;font-size:14px}
+.tt-switch label{color:rgba(255,255,255,.3);white-space:nowrap}
+.tt-switch select{background:rgba(0,0,0,.3);border:1px solid rgba(251,146,60,.2);border-radius:6px;padding:6px 12px;color:#fff;font-size:14px;font-family:inherit;cursor:pointer}
+.tt-switch .tt-badge{font-size:12px;padding:3px 10px;border-radius:4px}
+.tt-badge.active{background:rgba(76,175,80,.1);color:#4caf50}
+.mode-toggle{display:flex;margin-bottom:18px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+.mode-btn{flex:1;padding:13px 8px;text-align:center;cursor:pointer;font-size:16px;font-weight:600;background:rgba(255,255,255,.02);color:rgba(255,255,255,.35);border:none;font-family:inherit;transition:all .2s}
+.mode-btn+.mode-btn{border-left:1px solid rgba(255,255,255,.06)}
+.mode-btn:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.6)}
+.mode-btn.active{background:rgba(255,170,0,.08);color:#fa0}
+.mode-btn .mode-icon{display:block;font-size:24px}
+.mode-btn .mode-label{display:block;font-size:13px;margin-top:2px;opacity:.7}
+.depot-tabs{display:flex;gap:0;margin-bottom:18px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+.depot-tab{flex:1;padding:14px 8px;text-align:center;cursor:pointer;font-size:16px;font-weight:600;background:rgba(255,255,255,.02);color:rgba(255,255,255,.35);border:none;font-family:inherit;transition:all .2s}
+.depot-tab+.depot-tab{border-left:1px solid rgba(255,255,255,.06)}
+.depot-tab:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.6)}
+.depot-tab.active{background:rgba(255,170,0,.08);color:#fa0}
+.depot-tab .tab-count{display:block;font-size:24px;font-weight:900;line-height:1}
+.depot-tab .tab-label{display:block;font-size:13px;margin-top:2px;opacity:.7}
+.progress-wrap{margin-bottom:14px}
+.progress-info{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px}
+.progress-info span{color:rgba(255,255,255,.35)}
+.progress-info .done-num{color:#4caf50}
+.progress-bar{height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#fa0,#4caf50);border-radius:2px;transition:width .4s}
+.reminder-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:20px;margin-bottom:10px;transition:all .2s}
+.reminder-card:hover{background:rgba(255,255,255,.03)}
+.reminder-card.done{opacity:.5;border-color:rgba(76,175,80,.15)}
+.reminder-card.done .rc-train{text-decoration:line-through}
+.reminder-card.warn-yellow{border-color:rgba(255,200,0,.4);background:rgba(255,200,0,.04)}
+.reminder-card.warn-red{border-color:rgba(255,50,50,.4);background:rgba(255,50,50,.05);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 rgba(255,50,50,0)}50%{box-shadow:0 0 12px rgba(255,50,50,.2)}}
+.countdown-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;margin-bottom:4px;font-size:15px}
+.countdown-bar .cd-label{color:rgba(255,255,255,.3)}
+.countdown-bar .cd-time{font-family:'SF Mono','Consolas',monospace;font-size:24px;font-weight:900;color:#fa0}
+.countdown-bar .cd-now{font-family:'SF Mono','Consolas',monospace;font-size:20px;font-weight:700;color:rgba(255,255,255,.5)}
+.countdown-bar .cd-time.urgent-yellow{color:#ffc800}
+.countdown-bar .cd-time.urgent-red{color:#f33;animation:pulse 1s infinite}
+.countdown-bar .cd-status{font-size:13px;padding:4px 12px;border-radius:6px}
+.cd-status.normal{background:rgba(76,175,80,.1);color:#4caf50}
+.cd-status.urgent{background:rgba(255,200,0,.1);color:#ffc800}
+.cd-status.critical{background:rgba(255,50,50,.1);color:#f33}
+.rc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rc-train{font-size:22px;font-weight:900;letter-spacing:1px}
+.rc-route{font-size:22px;font-weight:900;color:#00e6b4}
+.rc-label{font-size:22px;font-weight:900;color:rgba(255,255,255,.35)}
+.rc-dir{font-size:13px;padding:3px 10px;border-radius:5px;font-weight:600}
+.rc-dir.down{background:rgba(0,230,180,.1);color:#00e6b4}
+.rc-dir.up{background:rgba(255,170,0,.1);color:#fa0}
+.rc-tag{font-size:13px;padding:3px 10px;border-radius:5px;font-weight:600}
+.rc-tag.full{background:rgba(180,100,255,.1);color:#b464ff}
+.rc-tag.partial{background:rgba(255,82,82,.12);color:#ff5252}
+.rc-station{font-size:15px;color:rgba(255,255,255,.45);margin-left:auto}
+.rc-detail{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:15px;color:rgba(255,255,255,.5);margin-bottom:14px}
+.rc-detail span{color:rgba(255,255,255,.3)}
+.rc-detail strong{color:#fa0;font-family:'SF Mono','Consolas',monospace;font-weight:500}
+.rc-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-remind{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.25);color:#4caf50}
+.btn-remind:hover{background:rgba(76,175,80,.15)}
+.btn-remind.done-state{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.3)}
+.empty{text-align:center;padding:40px;color:rgba(255,255,255,.15)}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.3);color:#4caf50;padding:10px 24px;border-radius:8px;font-size:15px;z-index:999;animation:toastIn .3s}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.warn-box{padding:16px 18px;background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.12);border-radius:8px;margin-bottom:14px;font-size:16px;color:rgba(255,255,255,.5);text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="badge">乘务专业AI工具集 · v2</div>
+  <h1>🔔 岗点提醒助手</h1>
+  <div class="sub">首末班车 · 跳停回厂 · 接车倒计时 · 双时刻表</div>
+</div>
+
+<div class="tt-switch">
+  <label>时刻表</label>
+  <select id="ttSelect" onchange="switchTimetable(this.value)">
+  </select>
+  <span class="tt-badge active" id="ttBadge">数据就绪</span>
+</div>
+
+<div class="mode-toggle">
+  <button class="mode-btn active" id="btnFirst" onclick="switchMode('first')">
+    <span class="mode-icon">🌅</span><span class="mode-label">首班车提醒</span>
+  </button>
+  <button class="mode-btn" id="btnLast" onclick="switchMode('last')">
+    <span class="mode-icon">🌙</span><span class="mode-label">末班车提醒</span>
+  </button>
+  <button class="mode-btn" id="btnSkip" onclick="switchMode('skip')">
+    <span class="mode-icon">🏃</span><span class="mode-label">跳停回厂</span>
+  </button>
+</div>
+
+<div id="infoBanner" style="display:none;padding:14px 18px;background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.15);border-radius:8px;margin-bottom:14px;font-size:14px">
+  <span style="color:#ff5252;font-weight:700">⚠ 提醒内容：</span>
+  <span style="color:rgba(255,255,255,.8)">关闭照明、关闭空调，门模式开关置MM位，带好备品</span>
+</div>
+
+<div id="countdownBar" class="countdown-bar" style="display:none">
+  <span class="cd-label">当前</span>
+  <span class="cd-now" id="cdNow">--:--:--</span>
+  <span class="cd-label" id="cdLabel1">距发车</span>
+  <span class="cd-time" id="cdTime1">--:--:--</span>
+  <span class="cd-label" id="cdLabel2" style="display:none">非全程</span>
+  <span class="cd-time" id="cdTime2" style="display:none">--:--:--</span>
+  <span class="cd-status normal" id="cdStatus">就绪</span>
+</div>
+
+<div class="depot-tabs" id="depotTabs"></div>
+
+<div class="progress-wrap">
+  <div class="progress-info">
+    <span id="progressLabel">今日提醒进度</span>
+    <span class="done-num" id="progressNum">0/0</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div id="reminderList"></div>
+
+</div>
+
+<!-- Timetable data files -->
+<script src="Z01152_data.js"></script>
+<script src="Z01647_data.js"></script>
+<script src="timetable-registry.js"></script>
+
+<script>
+// ============ TIMETABLE ENGINE ============
+let currentTT = 'Z01152';
+let TT = null;        // active timetable data
+let tmap = {};        // trainNo → train object
+
+function loadTT(key) {
+  currentTT = key;
+  TT = getTTData(key);
+  tmap = {};
+  if (!TT) { console.error('岗点提醒: 数据加载失败', key); return; }
+  for (var i = 0; i < TT.trains.length; i++) {
+    tmap[TT.trains[i].no] = TT.trains[i];
+  }
+  var badge = document.getElementById('ttBadge');
+  if (key === 'Z01152') {
+    badge.textContent = '数据就绪';
+    badge.className = 'tt-badge active';
+  } else {
+    var hasConfig = TRAIN_CONFIG[key] && TRAIN_CONFIG[key].first;
+    badge.textContent = hasConfig ? '数据就绪' : '⚠ 缺配置';
+    badge.className = 'tt-badge ' + (hasConfig ? 'active' : '');
+  }
+}
+
+// Lookup helpers
+function ttRoute(trainNo) {
+  var t = tmap[trainNo];
+  if (!t) return '';
+  if (t.routes && t.routes.length > 0) return t.routes[0];
+  return t.pickup || '';
+}
+
+function ttDepart(trainNo) {
+  var t = tmap[trainNo];
+  if (!t) return '--:--:--';
+  var s = t.stations[0];
+  return s.b || s.a || '--:--:--';
+}
+
+function ttStart(trainNo) {
+  var t = tmap[trainNo];
+  if (!t) return '--';
+  return t.start;
+}
+
+function ttEnd(trainNo) {
+  var t = tmap[trainNo];
+  if (!t) return '--';
+  return t.end;
+}
+
+function ttFirstRoute(trainNo) {
+  var t = tmap[trainNo];
+  if (!t) return '';
+  for (var i = 0; i < t.stations.length; i++) {
+    if (t.stations[i].route) return t.stations[i].route;
+  }
+  return '';
+}
+
+// Get time at specific station
+function ttStationTime(trainNo, stationName, field) {
+  var t = tmap[trainNo];
+  if (!t) return '--:--:--';
+  field = field || 'a';
+  for (var i = 0; i < t.stations.length; i++) {
+    if (t.stations[i].n === stationName) {
+      return t.stations[i][field] || t.stations[i].a || t.stations[i].b || '--:--:--';
+    }
+  }
+  return '--:--:--';
+}
+
+// ============ TRAIN CONFIG ============
+// These are operational configurations — which trains are first/last/skip
+// Route names and times are pulled dynamically from the timetable above
+
+var TRAIN_CONFIG = {};
+
+// --- Z01152 (工作日) ---
+TRAIN_CONFIG['Z01152'] = {
+  first: [
+    { depot:'瓦屋庄', trainNo:'011013', label:'青岛站首班', factoryTrain:'011001', factoryDepot:'瓦屋庄停车场' },
+    { depot:'瓦屋庄', trainNo:'022015', label:'王家港首班', factoryTrain:'021002', factoryDepot:'瓦屋庄停车场' },
+    { depot:'瓦屋庄', trainNo:'102010', label:'青岛站首班', factoryTrain:'101006', factoryDepot:'瓦屋庄停车场' },
+    { depot:'东郭庄', trainNo:'221016', label:'东郭庄首班', factoryTrain:'221016', factoryDepot:'东郭庄停车场' },
+    { depot:'安顺',   trainNo:'031019', label:'瑞金路首班',   factoryTrain:'032001', factoryDepot:'安顺车辆段' },
+    { depot:'安顺',   trainNo:'181018', label:'青岛北站首班', factoryTrain:'182013', factoryDepot:'安顺车辆段' },
+    { depot:'安顺',   trainNo:'212014', label:'青岛北站首班', factoryTrain:'212014', factoryDepot:'安顺车辆段' }
+  ],
+  last: [
+    { station:'东郭庄', trainNo:'021235', type:'全程',   endStation:'王家港' },
+    { station:'东郭庄', trainNo:'611242', type:'非全程', endStation:'山里' },
+    { station:'王家港', trainNo:'262230', type:'全程',   endStation:'东郭庄' },
+    { station:'王家港', trainNo:'572233', type:'非全程', endStation:'青岛北' }
+  ],
+  skip: [
+    // 东郭庄轮值 - 下行回安顺
+    { station:'东郭庄', trainNo:'421079', endDepot:'安顺车辆段', depotTime:'09:45:36', pickupTrain:'422048', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'431081', endDepot:'安顺车辆段', depotTime:'09:51:36', pickupTrain:'432051', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'491185', endDepot:'安顺车辆段', depotTime:'18:57:31', pickupTrain:'492160', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'071188', endDepot:'安顺车辆段', depotTime:'19:09:31', pickupTrain:'072163', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'581191', endDepot:'安顺车辆段', depotTime:'19:21:51', pickupTrain:'582169', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'591193', endDepot:'安顺车辆段', depotTime:'19:28:01', pickupTrain:'592171', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'281196', endDepot:'安顺车辆段', depotTime:'19:40:31', pickupTrain:'282168', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'011198', endDepot:'安顺车辆段', depotTime:'19:46:41', pickupTrain:'012170', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'051200', endDepot:'安顺车辆段', depotTime:'19:53:31', pickupTrain:'052172', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'081202', endDepot:'安顺车辆段', depotTime:'19:59:11', pickupTrain:'082174', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'361204', endDepot:'安顺车辆段', depotTime:'20:05:21', pickupTrain:'362176', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'661207', endDepot:'安顺车辆段', depotTime:'20:17:29', pickupTrain:'662187', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'251209', endDepot:'安顺车辆段', depotTime:'20:24:01', pickupTrain:'252181', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'091213', endDepot:'安顺车辆段', depotTime:'20:41:55', pickupTrain:'092188', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'451219', endDepot:'安顺车辆段', depotTime:'21:12:58', pickupTrain:'452194', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'131223', endDepot:'安顺车辆段', depotTime:'21:32:16', pickupTrain:'132198', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'471232', endDepot:'安顺车辆段', depotTime:'22:28:16', pickupTrain:'472207', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'481234', endDepot:'安顺车辆段', depotTime:'22:38:36', pickupTrain:'482209', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'111237', endDepot:'安顺车辆段', depotTime:'22:56:06', pickupTrain:'112212', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'601241', endDepot:'安顺车辆段', depotTime:'23:20:46', pickupTrain:'602216', pickupAt:'东郭庄' },
+    // 王家港轮值 - 上行回瓦屋庄
+    { station:'王家港', trainNo:'042069', endDepot:'瓦屋庄停车场', depotTime:'08:52:24', pickupTrain:'041040', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'372071', endDepot:'瓦屋庄停车场', depotTime:'08:58:55', pickupTrain:'371043', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'382073', endDepot:'瓦屋庄停车场', depotTime:'09:05:05', pickupTrain:'381045', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'202075', endDepot:'瓦屋庄停车场', depotTime:'09:11:01', pickupTrain:'201047', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'402077', endDepot:'瓦屋庄停车场', depotTime:'09:16:45', pickupTrain:'401048', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'272079', endDepot:'瓦屋庄停车场', depotTime:'09:22:55', pickupTrain:'271050', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'312081', endDepot:'瓦屋庄停车场', depotTime:'09:29:14', pickupTrain:'311051', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'502082', endDepot:'瓦屋庄停车场', depotTime:'09:31:19', pickupTrain:'501062', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'512084', endDepot:'瓦屋庄停车场', depotTime:'09:36:20', pickupTrain:'511064', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'522086', endDepot:'瓦屋庄停车场', depotTime:'09:41:50', pickupTrain:'521066', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'392088', endDepot:'瓦屋庄停车场', depotTime:'09:47:50', pickupTrain:'391068', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'192091', endDepot:'瓦屋庄停车场', depotTime:'10:00:15', pickupTrain:'191061', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'652221', endDepot:'瓦屋庄停车场', depotTime:'21:44:25', pickupTrain:'651205', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'222228', endDepot:'瓦屋庄停车场', depotTime:'22:27:23', pickupTrain:'221215', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'302231', endDepot:'瓦屋庄停车场', depotTime:'22:46:30', pickupTrain:'301218', pickupAt:'王家港' }
+  ]
+};
+
+// --- Z01647 (周末) ---
+TRAIN_CONFIG['Z01647'] = {
+  first: [
+    // 下行
+    { depot:'东郭庄', trainNo:'211016', label:'东郭庄首班',   factoryTrain:'211016', factoryDepot:'东郭庄停车场' },
+    { depot:'安顺',   trainNo:'031019', label:'瑞金路首班',   factoryTrain:'032001', factoryDepot:'安顺车辆段' },
+    { depot:'安顺',   trainNo:'181020', label:'青岛北站首班', factoryTrain:'182011', factoryDepot:'安顺车辆段' },
+    { depot:'瓦屋庄', trainNo:'011015', label:'青岛站首班',   factoryTrain:'011001', factoryDepot:'瓦屋庄停车场' },
+    // 上行
+    { depot:'瓦屋庄', trainNo:'022014', label:'王家港首班',   factoryTrain:'021002', factoryDepot:'瓦屋庄停车场' },
+    { depot:'瓦屋庄', trainNo:'112008', label:'青岛站首班',   factoryTrain:'111007', factoryDepot:'瓦屋庄停车场' },
+    { depot:'安顺',   trainNo:'202013', label:'青岛北站首班', factoryTrain:'202013', factoryDepot:'安顺车辆段' }
+  ],
+  last: [
+    { station:'东郭庄', trainNo:'291210', type:'全程',   endStation:'王家港' },
+    { station:'东郭庄', trainNo:'231218', type:'非全程', endStation:'山里' },
+    { station:'王家港', trainNo:'412209', type:'全程',   endStation:'东郭庄' },
+    { station:'王家港', trainNo:'332212', type:'非全程', endStation:'青岛北' }
+  ],
+  skip: [
+    // 东郭庄轮值 - 下行回安顺（非全程末班231218/22:45之前）
+    { station:'东郭庄', trainNo:'071195', endDepot:'安顺车辆段', depotTime:'21:20:45', pickupTrain:'072171', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'281201', endDepot:'安顺车辆段', depotTime:'21:52:00', pickupTrain:'282177', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'361206', endDepot:'安顺车辆段', depotTime:'22:19:50', pickupTrain:'362182', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'381209', endDepot:'安顺车辆段', depotTime:'22:35:50', pickupTrain:'382185', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'391211', endDepot:'安顺车辆段', depotTime:'22:47:55', pickupTrain:'392187', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'101214', endDepot:'安顺车辆段', depotTime:'23:04:10', pickupTrain:'102190', pickupAt:'东郭庄' },
+    { station:'东郭庄', trainNo:'191217', endDepot:'安顺车辆段', depotTime:'23:20:25', pickupTrain:'192193', pickupAt:'东郭庄' },
+    // 王家港轮值 - 上行回瓦屋庄（非全程末班332212/22:35之前）
+    { station:'王家港', trainNo:'212208', endDepot:'瓦屋庄停车场', depotTime:'22:37:13', pickupTrain:'211191', pickupAt:'王家港' },
+    { station:'王家港', trainNo:'302211', endDepot:'瓦屋庄停车场', depotTime:'22:53:13', pickupTrain:'301194', pickupAt:'王家港' }
+  ]
+};
+
+// Depot/station labels
+var DEPOT_LABELS = { '瓦屋庄':'瓦屋庄停车场', '安顺':'安顺车辆段', '东郭庄':'东郭庄停车场' };
+var STATION_LABELS = { '东郭庄':'东郭庄轮值', '王家港':'王家港轮值' };
+
+// ============ APP STATE ============
+var mode = 'first';
+var currentDepot = '瓦屋庄';
+var currentStation = '东郭庄';
+
+function switchTimetable(key) {
+  loadTT(key);
+  render();
+}
+
+function switchMode(m) {
+  mode = m;
+  document.getElementById('btnFirst').classList.toggle('active', m === 'first');
+  document.getElementById('btnLast').classList.toggle('active', m === 'last');
+  document.getElementById('btnSkip').classList.toggle('active', m === 'skip');
+  spokenAlerts = new Set();
+  render();
+}
+
+function switchDepot(d) { currentDepot = d; render(); }
+function switchStation(s) { currentStation = s; render(); }
+
+// ============ RENDER ============
+function render() {
+  if (mode === 'first') renderFirst();
+  else if (mode === 'last') renderLast();
+  else renderSkip();
+}
+
+function hasConfig() {
+  var cfg = TRAIN_CONFIG[currentTT];
+  if (!cfg) return false;
+  if (mode === 'first') return cfg.first && cfg.first.length > 0;
+  if (mode === 'last') return cfg.last && cfg.last.length > 0;
+  return cfg.skip && cfg.skip.length > 0;
+}
+
+function renderFirst() {
+  document.getElementById('infoBanner').style.display = 'none';
+  var cfg = TRAIN_CONFIG[currentTT];
+  if (!cfg || !cfg.first || cfg.first.length === 0) {
+    document.getElementById('reminderList').innerHTML = '<div class="warn-box">⚠ ' + currentTT + ' 首班车配置尚未录入，请联系方师傅提供周末车次配置</div>';
+    document.getElementById('depotTabs').innerHTML = '';
+    document.getElementById('progressNum').textContent = '0/0';
+    document.getElementById('progressFill').style.width = '0%';
+    return;
+  }
+
+  var depots = ['瓦屋庄','东郭庄','安顺'];
+  var tabs = document.getElementById('depotTabs');
+  tabs.style.display = 'flex';
+  tabs.innerHTML = depots.map(function(d) {
+    var trains = cfg.first.filter(function(t) { return t.depot === d; });
+    var active = d === currentDepot ? ' active' : '';
+    return '<button class="depot-tab' + active + '" onclick="switchDepot(\'' + d + '\')"><span class="tab-count">' + trains.length + '</span><span class="tab-label">' + (DEPOT_LABELS[d] || d) + '</span></button>';
+  }).join('');
+
+  var trains = cfg.first.filter(function(t) { return t.depot === currentDepot; });
+  var total = trains.length;
+  document.getElementById('progressLabel').textContent = '首班车提醒 · ' + (DEPOT_LABELS[currentDepot] || currentDepot);
+  document.getElementById('progressNum').textContent = total + '辆';
+  document.getElementById('progressFill').style.width = '0%';
+
+  document.getElementById('reminderList').innerHTML = trains.map(function(t) {
+    var train = tmap[t.trainNo];
+    var route = ttRoute(t.trainNo);
+    var dir = train ? (train.dir === 1 ? '下行' : '上行') : '--';
+    var dirCls = dir === '下行' ? 'down' : 'up';
+    var dirText = dir === '下行' ? '▼下行' : '▲上行';
+    var depart = ttDepart(t.trainNo);
+    var factoryTime = ttDepart(t.factoryTrain);
+    var startStation = ttStart(t.trainNo);
+    return '<div class="reminder-card">' +
+      '<div class="rc-top">' +
+        '<span class="rc-train">' + t.trainNo + '</span>' +
+        '<span class="rc-label">（' + t.label + '）</span>' +
+        '<span class="rc-route">' + route + '</span>' +
+        '<span class="rc-dir ' + dirCls + '">' + dirText + '</span>' +
+        '<span class="rc-station">' + startStation + '站发</span>' +
+      '</div>' +
+      '<div class="rc-detail">' +
+        '<div><span>发车时间</span> <strong>' + depart + '</strong></div>' +
+        '<div><span>出厂车次</span> <strong>' + t.factoryTrain + '</strong></div>' +
+        '<div><span>出厂时间</span> <strong>' + factoryTime + '</strong></div>' +
+        '<div><span>出厂车厂</span> <strong>' + t.factoryDepot + '</strong></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderLast() {
+  document.getElementById('infoBanner').style.display = 'none';
+  var cfg = TRAIN_CONFIG[currentTT];
+  if (!cfg || !cfg.last || cfg.last.length === 0) {
+    document.getElementById('reminderList').innerHTML = '<div class="warn-box">⚠ ' + currentTT + ' 末班车配置尚未录入，请联系方师傅提供周末车次配置</div>';
+    document.getElementById('depotTabs').innerHTML = '';
+    document.getElementById('progressNum').textContent = '0/0';
+    document.getElementById('progressFill').style.width = '0%';
+    return;
+  }
+
+  var stations = ['东郭庄','王家港'];
+  var tabs = document.getElementById('depotTabs');
+  tabs.style.display = 'flex';
+  tabs.innerHTML = stations.map(function(sn) {
+    var trains = cfg.last.filter(function(t) { return t.station === sn; });
+    var active = sn === currentStation ? ' active' : '';
+    return '<button class="depot-tab' + active + '" onclick="switchStation(\'' + sn + '\')"><span class="tab-count">' + trains.length + '</span><span class="tab-label">' + (STATION_LABELS[sn] || sn) + '</span></button>';
+  }).join('');
+
+  var trains = cfg.last.filter(function(t) { return t.station === currentStation; });
+  var total = trains.length;
+  document.getElementById('progressLabel').textContent = '末班车提醒 · ' + (STATION_LABELS[currentStation] || currentStation);
+  document.getElementById('progressNum').textContent = total + '辆';
+  document.getElementById('progressFill').style.width = '0%';
+
+  document.getElementById('reminderList').innerHTML = trains.map(function(t) {
+    var train = tmap[t.trainNo];
+    var route = ttRoute(t.trainNo);
+    var dir = train ? (train.dir === 1 ? '下行' : '上行') : '--';
+    var dirCls = dir === '下行' ? 'down' : 'up';
+    var dirText = dir === '下行' ? '▼下行' : '▲上行';
+    var depart = ttDepart(t.trainNo);
+    var startStation = ttStart(t.trainNo);
+    var typeTag = t.type === '全程' ? 'full' : 'partial';
+    var endStationName = t.type === '全程' ? ttEnd(t.trainNo) : t.endStation;
+    return '<div class="reminder-card">' +
+      '<div class="rc-top">' +
+        '<span class="rc-train">' + t.trainNo + '</span>' +
+        '<span class="rc-route">' + route + '</span>' +
+        '<span class="rc-dir ' + dirCls + '">' + dirText + '</span>' +
+        '<span class="rc-tag ' + typeTag + '">' + (t.type === '全程' ? '全程末班' : '非全程末班') + '</span>' +
+        '<span class="rc-station">' + startStation + '站发</span>' +
+      '</div>' +
+      '<div class="rc-detail">' +
+        '<div><span>发车时间</span> <strong>' + depart + '</strong></div>' +
+        '<div><span>终到站</span> <strong>' + endStationName + '站</strong></div>' +
+        '<div><span>类型</span> <strong style="color:' + (t.type==='全程' ? '#b464ff' : '#ff5252') + '">' + t.type + '末班车</strong></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderSkip() {
+  document.getElementById('infoBanner').style.display = 'block';
+  var cfg = TRAIN_CONFIG[currentTT];
+  if (!cfg || !cfg.skip || cfg.skip.length === 0) {
+    document.getElementById('reminderList').innerHTML = '<div class="warn-box">⚠ ' + currentTT + ' 跳停车配置尚未录入，请联系方师傅提供周末车次配置</div>';
+    document.getElementById('depotTabs').innerHTML = '';
+    document.getElementById('progressNum').textContent = '0/0';
+    document.getElementById('progressFill').style.width = '0%';
+    return;
+  }
+
+  var stations = ['东郭庄','王家港'];
+  var tabs = document.getElementById('depotTabs');
+  tabs.style.display = 'flex';
+  tabs.innerHTML = stations.map(function(sn) {
+    var trains = cfg.skip.filter(function(t) { return t.station === sn; });
+    var active = sn === currentStation ? ' active' : '';
+    return '<button class="depot-tab' + active + '" onclick="switchStation(\'' + sn + '\')"><span class="tab-count">' + trains.length + '</span><span class="tab-label">' + (STATION_LABELS[sn] || sn) + '</span></button>';
+  }).join('');
+
+  var trains = cfg.skip.filter(function(t) { return t.station === currentStation; });
+  var total = trains.length;
+  document.getElementById('progressLabel').textContent = '跳停回厂 · ' + (STATION_LABELS[currentStation] || currentStation);
+  document.getElementById('progressNum').textContent = total + '辆';
+  document.getElementById('progressFill').style.width = '0%';
+
+  // Mark passed/upcoming and find first upcoming index
+  var now = new Date();
+  var nowStr = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+  var firstUpcoming = -1;
+  trains.forEach(function(t, i) {
+    var pt = ttStationTime(t.pickupTrain, t.pickupAt, 'a');
+    if (firstUpcoming < 0 && (pt === '--:--:--' || pt > nowStr)) firstUpcoming = i;
+  });
+
+  document.getElementById('reminderList').innerHTML = trains.map(function(t, i) {
+    var train = tmap[t.trainNo];
+    var route = ttRoute(t.trainNo);
+    var dir = train ? (train.dir === 1 ? '下行' : '上行') : '--';
+    var dirCls = dir === '下行' ? 'down' : 'up';
+    var dirText = dir === '下行' ? '▼下行' : '▲上行';
+    var depart = ttDepart(t.trainNo);
+    var endTime = t.depotTime || ttStationTime(t.trainNo, t.endDepot.replace('车辆段','').replace('停车场',''), 'a');
+    var pickupTime = ttStationTime(t.pickupTrain, t.pickupAt, 'a');
+    var startStation = ttStart(t.trainNo);
+    var isPassed = i < firstUpcoming;
+    return '<div class="reminder-card' + (isPassed ? ' done' : '') + '"' + (i === firstUpcoming ? ' id="skip-first-upcoming"' : '') + '>' +
+      '<div class="rc-top">' +
+        '<span class="rc-train">' + t.trainNo + '</span>' +
+        '<span class="rc-route">' + route + '</span>' +
+        '<span class="rc-dir ' + dirCls + '">' + dirText + '</span>' +
+        '<span class="rc-station">' + startStation + '站发 → ' + t.endDepot + '</span>' +
+      '</div>' +
+      '<div class="rc-detail">' +
+        '<div><span>接车时间</span> <strong>' + pickupTime + '</strong></div>' +
+        '<div><span>接车车次</span> <strong>' + t.pickupTrain + '</strong></div>' +
+        '<div><span>发车时间</span> <strong>' + depart + '</strong></div>' +
+        '<div><span>回厂时间</span> <strong>' + endTime + '</strong></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Auto-scroll to first upcoming card
+  if (firstUpcoming >= 0) {
+    setTimeout(function() {
+      var el = document.getElementById('skip-first-upcoming');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+}
+
+// ============ SPEECH ============
+var spokenAlerts = new Set();
+
+function sayText(text) {
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN'; u.rate = 0.85; u.pitch = 1.0;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// ============ COUNTDOWN ============
+function updateCountdown() {
+  var bar = document.getElementById('countdownBar');
+  var timeEl1 = document.getElementById('cdTime1');
+  var timeEl2 = document.getElementById('cdTime2');
+  var label1 = document.getElementById('cdLabel1');
+  var label2 = document.getElementById('cdLabel2');
+  var statusEl = document.getElementById('cdStatus');
+  
+  bar.style.display = 'flex';
+  var now = new Date();
+  document.getElementById('cdNow').textContent = 
+    String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+  
+  if (!hasConfig()) { timeEl1.textContent = '--:--:--'; return; }
+
+  var targets = [];
+  if (mode === 'first') {
+    targets = [{ h:5, m:30, s:0 }];
+    label1.textContent = '距发车';
+    label2.style.display = 'none';
+    timeEl2.style.display = 'none';
+  } else if (mode === 'last') {
+    label1.textContent = '全程';
+    label2.style.display = 'inline';
+    timeEl2.style.display = 'inline';
+    if (currentStation === '东郭庄') {
+      targets = [{ h:22, m:3, s:0 }, { h:22, m:45, s:0 }];
+    } else {
+      targets = [{ h:22, m:18, s:0 }, { h:22, m:35, s:0 }];
+    }
+    label2.textContent = '非全程';
+  } else {
+    label2.style.display = 'none';
+    timeEl2.style.display = 'none';
+    var cfg = TRAIN_CONFIG[currentTT];
+    var skipTrains = cfg && cfg.skip ? cfg.skip.filter(function(t) { return t.station === currentStation; }) : [];
+    var nextTrain = null, nextTarget = null;
+    for (var i = 0; i < skipTrains.length; i++) {
+      var t = skipTrains[i];
+      var pickupTime = ttStationTime(t.pickupTrain, t.pickupAt, 'a');
+      if (pickupTime === '--:--:--') continue;
+      var parts = pickupTime.split(':'); var ph = +parts[0], pm = +parts[1], ps = +parts[2] || 0;
+      var pt = new Date(now); pt.setHours(ph, pm, ps, 0);
+      if (now < pt && (!nextTarget || pt < nextTarget)) { nextTrain = t; nextTarget = pt; }
+    }
+    if (nextTrain && nextTarget) {
+      targets = [{ h: nextTarget.getHours(), m: nextTarget.getMinutes(), s: nextTarget.getSeconds() }];
+      var route = ttRoute(nextTrain.trainNo);
+      label1.textContent = nextTrain.trainNo + '（' + route + '）←' + nextTrain.pickupTrain;
+    } else {
+      timeEl1.textContent = '--:--:--';
+      statusEl.className = 'cd-status normal'; statusEl.textContent = '今日已完'; return;
+    }
+  }
+  
+  var minLeft = Infinity;
+  for (var i = 0; i < targets.length; i++) {
+    var el = i === 0 ? timeEl1 : timeEl2;
+    var t = targets[i], target = new Date(now);
+    target.setHours(t.h, t.m, t.s, 0);
+    var diff = target - now;
+    if (diff < 0) {
+      el.textContent = '已发车'; el.className = 'cd-time';
+    } else {
+      var hh = Math.floor(diff / 3600000);
+      var mm = Math.floor((diff % 3600000) / 60000);
+      var ss = Math.floor((diff % 60000) / 1000);
+      el.textContent = String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+      el.className = 'cd-time';
+      minLeft = Math.min(minLeft, diff / 60000);
+    }
+  }
+  
+  timeEl1.classList.remove('urgent-yellow','urgent-red');
+  timeEl2.classList.remove('urgent-yellow','urgent-red');
+  
+  if (minLeft === Infinity || minLeft < 0) { statusEl.textContent = '今日已过'; return; }
+  
+  if (minLeft <= 1) {
+    timeEl1.classList.add('urgent-red');
+    if (targets.length > 1 && timeEl2.textContent !== '已发车') timeEl2.classList.add('urgent-red');
+    statusEl.className = 'cd-status critical'; statusEl.textContent = '⚠ 紧急';
+  } else if (minLeft <= 2) {
+    timeEl1.classList.add('urgent-red');
+    if (targets.length > 1 && timeEl2.textContent !== '已发车') timeEl2.classList.add('urgent-red');
+    statusEl.className = 'cd-status critical'; statusEl.textContent = '⚠ 紧急';
+    if (Math.floor(minLeft) === 2) speakCurrent(minLeft);
+  } else if (minLeft <= 3) {
+    timeEl1.classList.add('urgent-yellow');
+    if (targets.length > 1 && timeEl2.textContent !== '已发车') timeEl2.classList.add('urgent-yellow');
+    statusEl.className = 'cd-status urgent'; statusEl.textContent = '⚡ 告警';
+    if (Math.floor(minLeft) === 3) speakCurrent(minLeft);
+  } else {
+    statusEl.className = 'cd-status normal'; statusEl.textContent = '就绪';
+  }
+  
+  var cards = document.querySelectorAll('.reminder-card');
+  for (var i = 0; i < cards.length; i++) {
+    cards[i].classList.remove('warn-yellow','warn-red');
+    if (minLeft <= 1) cards[i].classList.add('warn-red');
+    else if (minLeft <= 2) { cards[i].style.borderColor='rgba(255,50,50,.4)'; cards[i].style.background='rgba(255,50,50,.05)'; }
+    else if (minLeft <= 3) cards[i].classList.add('warn-yellow');
+  }
+}
+
+function speakCurrent(minutes) {
+  var cfg = TRAIN_CONFIG[currentTT];
+  if (!cfg) return;
+  var trains;
+  if (mode === 'first') trains = (cfg.first || []).filter(function(t) { return t.depot === currentDepot; });
+  else if (mode === 'last') trains = (cfg.last || []).filter(function(t) { return t.station === currentStation; });
+  else trains = (cfg.skip || []).filter(function(t) { return t.station === currentStation; });
+  for (var i = 0; i < trains.length; i++) {
+      var key = mode + '-' + trains[i].trainNo + '-' + Math.floor(minutes);
+      if (spokenAlerts.has(key)) continue;
+      spokenAlerts.add(key);
+      var train = tmap[trains[i].trainNo];
+      var dir = train ? (train.dir === 1 ? '下行' : '上行') : '';
+      var digMap = {'0':'洞','1':'幺','2':'两','3':'三','4':'四','5':'五','6':'六','7':'拐','8':'八','9':'玖'};
+      var tnSpoken = trains[i].trainNo.split('').map(function(c) { return digMap[c] || c; }).join('');
+      if (mode === 'first') {
+        var station = trains[i].label.replace('首班','');
+        var text = station + dir + '首班车' + tnSpoken + '次即将发车，请派班员做好发车提醒';
+        sayText(text);
+      } else if (mode === 'last') {
+        var station = trains[i].station;
+        var fullText = trains[i].type === '全程' ? '全程' : '非全程';
+        var text = station + dir + fullText + '末班车' + tnSpoken + '次即将发车，请' + station + '轮值做好提醒';
+        sayText(text);
+      } else {
+        var depot = trains[i].endDepot.replace('车辆段','').replace('停车场','');
+        var station = trains[i].station;
+        var text = depot + '高峰跳停回厂车' + tnSpoken + '次即将接车，请' + station + '轮值做好接车提醒';
+        sayText(text);
+      }
+  }
+}
+
+function showToast(msg) {
+  var existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  var el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(function() { el.remove(); }, 2000);
+}
+
+// ============ INIT ============
+populateTTSelect('Z01152');loadTT('Z01152');
+setInterval(updateCountdown, 1000);
+updateCountdown();
+render();
+</script>
+</body>
+</html>

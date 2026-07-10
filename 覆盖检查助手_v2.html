@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>覆盖检查助手 v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#120a1e 0%,#1a102e 30%,#221540 60%,#120a1e 100%);color:#fff;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:20px 16px}
+.header{text-align:center;padding:20px 0 16px;border-bottom:1px solid rgba(180,100,255,.08);margin-bottom:18px}
+.header .badge{display:inline-block;background:rgba(180,100,255,.1);border:1px solid rgba(180,100,255,.2);color:#b464ff;padding:4px 14px;border-radius:12px;font-size:13px;letter-spacing:2px;margin-bottom:6px}
+.header h1{font-size:28px;font-weight:900;background:linear-gradient(135deg,#b464ff,#c896ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header .sub{font-size:13px;color:rgba(255,255,255,.35);margin-top:2px}
+.top-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(255,255,255,.03);border-radius:10px;margin-bottom:16px;font-size:14px;gap:12px;flex-wrap:wrap}
+.top-bar .tb-label{color:rgba(255,255,255,.4);white-space:nowrap}
+.top-bar select{background:rgba(0,0,0,.3);border:1px solid rgba(180,100,255,.2);border-radius:6px;padding:6px 10px;color:#fff;font-size:14px;font-family:inherit}
+.top-bar select option{background:#120a1e}
+.top-bar .tb-current{color:#b464ff;font-family:'SF Mono','Consolas',monospace}
+.qf{background:rgba(255,255,255,.03);border:1px solid rgba(180,100,255,.1);border-radius:12px;padding:18px;margin-bottom:18px}
+.qf-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.qf-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:90px}
+.qf-group label{font-size:13px;color:rgba(255,255,255,.4)}
+.qf-group input,.qf-group select{background:rgba(0,0,0,.3);border:1px solid rgba(180,100,255,.15);border-radius:8px;padding:10px 12px;color:#fff;font-size:15px;font-family:inherit;outline:none}
+.qf-group input:focus,.qf-group select:focus{border-color:#b464ff}
+.qf-group select option{background:#120a1e;color:#fff}
+.btn{padding:10px 24px;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.5px;transition:all .2s;white-space:nowrap}
+.btn-p{background:linear-gradient(135deg,#b464ff,#8b3fd4);color:#fff}
+.btn-p:hover{box-shadow:0 4px 16px rgba(180,100,255,.3);transform:translateY(-1px)}
+.btn-s{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-size:13px;padding:7px 16px}
+.btn-s:hover{background:rgba(255,255,255,.1)}
+.suggest-wrap{position:relative}
+.suggest-list{position:absolute;top:100%;left:0;right:0;background:#120a1e;border:1px solid rgba(180,100,255,.3);border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;z-index:10;display:none}
+.suggest-list.show{display:block}
+.suggest-list div{padding:8px 12px;font-size:14px;cursor:pointer}
+.suggest-list div:hover{background:rgba(180,100,255,.15)}
+.stats-bar{display:flex;gap:16px;flex-wrap:wrap;padding:10px 14px;background:rgba(180,100,255,.05);border:1px solid rgba(180,100,255,.1);border-radius:10px;margin-bottom:12px;font-size:13px;align-items:center}
+.stats-bar .stat{display:flex;flex-direction:column;align-items:center;min-width:50px}
+.stats-bar .stat-num{font-size:22px;font-weight:900}
+.stat.checked .stat-num{color:#4caf50}
+.stat.pending .stat-num{color:#ff9800}
+.stat.total .stat-num{color:#b464ff}
+.stat-label{color:rgba(255,255,255,.35);font-size:11px}
+.rstatus{padding:6px 0;font-size:13px;color:rgba(255,255,255,.45);margin-bottom:10px}
+.check-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;margin-bottom:6px;transition:all .2s;cursor:pointer}
+.check-item:hover{background:rgba(255,255,255,.04)}
+.check-item.done{opacity:.45}
+.check-item.done .ci-train{text-decoration:line-through}
+.check-box{width:20px;height:20px;border-radius:4px;border:2px solid rgba(180,100,255,.3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.check-item.done .check-box{background:#4caf50;border-color:#4caf50}
+.check-item.done .check-box::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+.ci-train{font-size:15px;font-weight:700;min-width:80px}
+.ci-dir{font-size:11px;padding:2px 8px;border-radius:5px;font-weight:600}
+.ci-dir.down{background:rgba(0,230,180,.1);color:#00e6b4}
+.ci-dir.up{background:rgba(255,170,0,.1);color:#ffaa00}
+.ci-time{font-family:'SF Mono','Consolas',monospace;font-size:13px;color:#b464ff;min-width:55px}
+.ci-station{font-size:13px;color:rgba(255,255,255,.5);flex:1}
+.empty{text-align:center;padding:40px;color:rgba(255,255,255,.2)}
+.empty .ph-icon{font-size:36px;margin-bottom:10px}
+.loading{text-align:center;padding:30px}
+.spinner{display:inline-block;width:26px;height:26px;border:3px solid rgba(180,100,255,.1);border-top-color:#b464ff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;top:16px;right:16px;background:rgba(255,82,82,.12);border:1px solid rgba(255,82,82,.3);color:#ff5252;padding:10px 16px;border-radius:8px;font-size:14px;z-index:999}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="badge">乘务专业AI工具集 · v2</div><h1>✅ 覆盖检查助手</h1><div class="sub">列车预告 · 逐车标记 · 台账导出 · 双时刻表</div></div>
+<div class="top-bar"><span class="tb-label">📅 时刻表</span><select id="ttSelect"></select><span style="flex:1;"></span><span class="tb-label">🕐 当前时间</span><span class="tb-current" id="liveClock">--:--:--</span></div>
+<div class="qf"><div class="qf-row"><div class="qf-group suggest-wrap" style="flex:2;min-width:140px;"><label>检查车站</label><input type="text" id="sName" placeholder="输入站名" autocomplete="off"><div class="suggest-list" id="sList"></div></div><div class="qf-group" style="max-width:130px;"><label>方向</label><select id="sDir"><option value="0">不限</option><option value="1">下行（北→南）</option><option value="2">上行（南→北）</option></select></div><div class="qf-group" style="max-width:90px;"><label>范围</label><select id="sMode" onchange="document.getElementById('sVal').placeholder=this.value==='trains'?'趟数':'分钟'"><option value="trains">按趟数</option><option value="minutes">按分钟</option></select></div><div class="qf-group" style="max-width:70px;"><label>数量</label><input type="number" id="sVal" value="10" min="1" max="100" placeholder="趟数"></div><button class="btn btn-p" id="btnQ">开始检查</button></div><div class="qf-row" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04)"><div class="qf-group" style="max-width:140px;"><label>检查车次</label><input type="text" id="checkTrain" placeholder="车次号或下拉选择" list="trainList" autocomplete="off"><datalist id="trainList"></datalist></div><div class="qf-group" style="max-width:200px;"><label>检查项目</label><select id="checkItem"><option value="">选择项目</option><option value="PSL遮挡测试">PSL遮挡测试</option><option value="夹物测试">夹物测试</option><option value="门选测试">门选测试</option><option value="主控手柄测试">主控手柄测试</option></select></div><div class="qf-group" style="max-width:110px;"><label>是否通过</label><select id="isPass"><option value="">-</option><option value="是">是</option><option value="否">否</option></select></div><div class="qf-group" style="flex:2;"><label>补充信息</label><input type="text" id="extraInfo" placeholder="如：班次、检查人等" autocomplete="off"></div></div></div>
+<div id="results"><div class="empty"><div class="ph-icon">✅</div>选择车站和方向，查看即将经过的列车并逐车标记</div></div>
+</div>
+
+<script>
+(function(){var el=document.getElementById('liveClock');function tick(){var n=new Date();el.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0')}setInterval(tick,1e3);tick()})();
+</script>
+<script src="Z01152_data.js"></script>
+<script src="Z01647_data.js"></script>
+<script src="timetable-registry.js"></script>
+<script>
+var trains=[],tIdx={},stIdx={},allStations=[],checkedMap={},currentResults=[];
+
+function nowStr(){var n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0')}
+function t2s(t){if(!t)return Infinity;var p=t.split(':').map(Number);return p[0]*3600+p[1]*60+(p[2]||0)}
+function toast(m){var e=document.createElement('div');e.className='toast';e.textContent=m;document.body.appendChild(e);setTimeout(function(){e.remove()},2500)}
+
+function loadTT(key){
+  var r=document.getElementById('results');
+  r.innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  try{
+    var raw=getTTData(key);
+    if(!raw||!raw.trains)throw new Error('load failed');
+    trains=raw.trains.map(function(t){return{trainNo:t.no,direction:t.dir===1?'下行':'上行',directionCode:t.dir,schedule:t.stations.map(function(s){return{station:s.n,arrival:s.a||null,departure:s.b||null}}),stationCount:t.stations.length}});
+    var ss=new Set();
+    for(var i=0;i<trains.length;i++)for(var j=0;j<trains[i].schedule.length;j++)ss.add(trains[i].schedule[j].station);
+    allStations=[].concat(Array.from(ss)).sort();
+    tIdx={};
+    for(var i=0;i<trains.length;i++){var t=trains[i];tIdx[t.trainNo]=t;var s4=t.trainNo.slice(-4);if(!tIdx[s4])tIdx[s4]=t}
+    stIdx={};
+    for(var i=0;i<trains.length;i++){var t=trains[i];var dk=t.directionCode===1?'down':'up';for(var j=0;j<t.schedule.length;j++){var sn=t.schedule[j].station;if(!stIdx[sn])stIdx[sn]={down:[],up:[]};stIdx[sn][dk].push(t)}}
+    r.innerHTML='<div class="empty"><div class="ph-icon">✅</div>选择车站和方向，查看即将经过的列车并逐车标记</div>'
+  }catch(e){r.innerHTML='<div class="empty"><div class="ph-icon">⚠️</div>加载失败</div>';console.error(e)}
+}
+
+function doQuery(){
+  var name=document.getElementById('sName').value.trim();
+  var dir=parseInt(document.getElementById('sDir').value);
+  var mode=document.getElementById('sMode').value;
+  var val=parseInt(document.getElementById('sVal').value)||10;
+  var r=document.getElementById('results');
+  if(!name){toast('请输入车站名称');return}
+  var match=allStations.find(function(s){return s===name});
+  if(!match)match=allStations.find(function(s){return s===name+'站'});
+  if(!match)match=allStations.find(function(s){return s.replace(/站$/,'')===name.replace(/站$/,'')});
+  if(!match)match=allStations.find(function(s){return s.includes(name)});
+  if(!match)match=allStations.find(function(s){return name.includes(s)});
+  if(!match){r.innerHTML='<div class="empty"><div class="ph-icon">🔍</div>未找到匹配的车站</div>';return}
+
+  checkedMap={};currentResults=[];
+  var candidates=[];
+  if(dir===0){
+    candidates=[].concat((stIdx[match]&&stIdx[match].down||[]).map(function(t){var c=Object.assign({},t);c._dir=1;return c}),
+                         (stIdx[match]&&stIdx[match].up||[]).map(function(t){var c=Object.assign({},t);c._dir=2;return c}));
+  }else{
+    var dk=dir===1?'down':'up';
+    candidates=(stIdx[match]&&stIdx[match][dk]||[]).map(function(t){var c=Object.assign({},t);c._dir=dir;return c});
+  }
+
+  var ct=nowStr();var ctSec=t2s(ct);
+  candidates=candidates.map(function(t){
+    var ss=t.schedule.find(function(s){return s.station===match});
+    var tt=ss?(ss.departure||ss.arrival):null;
+    var diff=tt?t2s(tt)-ctSec:Infinity;
+    t._time=tt;t._diff=diff;t._station=match;return t;
+  }).filter(function(t){return t._time&&t._diff>=-120});
+
+  candidates.sort(function(a,b){return a._diff-b._diff});
+  if(mode==='trains')currentResults=candidates.slice(0,val);
+  else currentResults=candidates.filter(function(t){return t._diff<=val*60});
+  if(!currentResults.length){r.innerHTML='<div class="empty"><div class="ph-icon">🚉</div>该站当前方向暂无后续列车</div>';return}
+  renderChecks(match,dir,ct)
+}
+
+function renderChecks(match,dir,ct){
+  var r=document.getElementById('results');
+  document.getElementById('trainList').innerHTML=currentResults.map(function(t){return'<option value="'+t.trainNo+'">'+t.trainNo+' ('+(t._dir===1?'↓':'↑')+')</option>'}).join('');
+  var checked=currentResults.filter(function(t){return checkedMap[t.trainNo]}).length;
+  var pending=currentResults.length-checked;
+  var dLabel=dir===0?'不限方向':(dir===1?'下行':'上行');
+  var html='<div class="rstatus">'+match+' · '+dLabel+' · 当前 '+ct+' · '+currentResults.length+' 趟</div><div class="stats-bar"><div class="stat total"><span class="stat-num">'+currentResults.length+'</span><span class="stat-label">总计</span></div><div class="stat checked"><span class="stat-num">'+checked+'</span><span class="stat-label">已覆盖</span></div><div class="stat pending"><span class="stat-num">'+pending+'</span><span class="stat-label">待检查</span></div><span style="flex:1;"></span><button class="btn btn-s" onclick="exportDaily()">📋 导出</button><button class="btn btn-s" onclick="clearChecks()">🔄 重置</button></div>';
+  html+=currentResults.map(function(t,i){
+    var isDone=checkedMap[t.trainNo];
+    var dc=t._dir===1?'down':'up';
+    var dl=t._dir===1?'↓ 下行':'↑ 上行';
+    var dm=Math.round(t._diff/60);
+    return'<div class="check-item'+(isDone?' done':'')+'" onclick="toggleCheck(\''+t.trainNo+'\')"><div class="check-box"></div><span class="ci-train">'+t.trainNo+'</span><span class="ci-dir '+dc+'">'+dl+'</span><span class="ci-time">'+t._time+'</span><span class="ci-station">约 '+dm+' 分钟后到站 · '+(t.stationCount||'?')+' 站</span></div>'
+  }).join('');
+  r.innerHTML=html
+}
+
+function toggleCheck(trainNo){checkedMap[trainNo]=!checkedMap[trainNo];renderChecks(currentResults[0]._station,parseInt(document.getElementById('sDir').value),nowStr())}
+function clearChecks(){checkedMap={};renderChecks(currentResults[0]._station,parseInt(document.getElementById('sDir').value),nowStr())}
+
+function exportDaily(){
+  var station=currentResults[0]&&currentResults[0]._station||'未知';
+  var ct=nowStr().substring(0,5);
+  var checked=currentResults.filter(function(t){return checkedMap[t.trainNo]}).length;
+  var total=currentResults.length;
+  var text='覆盖检查日报\n';
+  text+='车站：'+station+'\n';
+  var extra=document.getElementById('extraInfo').value.trim();
+  var checkItem=document.getElementById('checkItem').value;
+  if(checkItem)text+='检查项目：'+checkItem+'\n';
+  var checkTrain=document.getElementById('checkTrain').value.trim();
+  if(checkTrain)text+='检查车次：'+checkTrain+'\n';
+  var isPass=document.getElementById('isPass').value;
+  if(isPass)text+='是否通过：'+isPass+'\n';
+  if(extra)text+='补充信息：'+extra+'\n';
+  text+='检查时间：'+ct+'\n';
+  text+='覆盖情况：'+checked+'/'+total+'（'+(total>0?Math.round(checked/total*100):0)+'%）\n';
+  text+='──\n';
+  currentResults.forEach(function(t){var mark=checkedMap[t.trainNo]?'✓':'✗';text+=mark+' '+t.trainNo+'  '+t._time+'  '+(t._dir===1?'下行':'上行')+'\n'});
+  navigator.clipboard.writeText(text).then(function(){toast('已复制到剪贴板')})['catch'](function(){toast('复制失败')});
+  var r=document.getElementById('results');
+  var ta=document.createElement('textarea');
+  ta.value=text;
+  ta.style.cssText='width:100%;height:200px;background:#120a1e;color:#fff;border:1px solid rgba(180,100,255,0.3);border-radius:8px;padding:12px;font-family:monospace;font-size:13px;margin-top:12px;';
+  r.appendChild(ta)
+}
+
+document.getElementById('btnQ').addEventListener('click',doQuery);
+document.getElementById('sName').addEventListener('keydown',function(e){if(e.key==='Enter')doQuery()});
+var sEl=document.getElementById('sName'),sList=document.getElementById('sList');
+sEl.addEventListener('input',function(){var v=sEl.value.trim();if(!v){sList.classList.remove('show');return}var hits=allStations.filter(function(s){return s.includes(v)||s.replace(/站$/,'').includes(v)}).slice(0,8);if(!hits.length){sList.classList.remove('show');return}sList.innerHTML=hits.map(function(s){return'<div>'+s+'</div>'}).join('');sList.classList.add('show')});
+sList.addEventListener('click',function(e){if(e.target.tagName==='DIV'){sEl.value=e.target.textContent;sList.classList.remove('show')}});
+document.addEventListener('click',function(e){if(!sEl.parentElement.contains(e.target))sList.classList.remove('show')});
+document.getElementById('ttSelect').addEventListener('change',function(){loadTT(this.value)});
+populateTTSelect('Z01152');loadTT('Z01152');
+</script>
+</body>
+</html>

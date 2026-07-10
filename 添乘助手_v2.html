@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>添乘助手 v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif; background:linear-gradient(135deg,#1a0f0a 0%,#26160d 30%,#332015 60%,#1a0f0a 100%); color:#fff; min-height:100vh; }
+.container { max-width:900px; margin:0 auto; padding:20px 16px; }
+.header { text-align:center; padding:20px 0 16px; border-bottom:1px solid rgba(255,136,0,.08); margin-bottom:18px; }
+.header .badge { display:inline-block; background:rgba(255,136,0,.1); border:1px solid rgba(255,136,0,.2); color:#ff8800; padding:4px 14px; border-radius:12px; font-size:13px; letter-spacing:2px; margin-bottom:6px; }
+.header h1 { font-size:28px; font-weight:900; background:linear-gradient(135deg,#ff8800,#ffcc00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.header .sub { font-size:13px; color:rgba(255,255,255,.35); margin-top:2px; }
+.top-bar { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(255,255,255,.03); border-radius:10px; margin-bottom:16px; font-size:14px; gap:12px; flex-wrap:wrap; }
+.top-bar .tb-label { color:rgba(255,255,255,.4); white-space:nowrap; }
+.top-bar select { background:rgba(0,0,0,.3); border:1px solid rgba(255,136,0,.2); border-radius:6px; padding:6px 10px; color:#fff; font-size:14px; font-family:inherit; }
+.top-bar select option { background:#1a0f0a; }
+.top-bar .tb-current { color:#ff8800; font-family:'SF Mono','Consolas',monospace; }
+.qf { background:rgba(255,255,255,.03); border:1px solid rgba(255,136,0,.1); border-radius:12px; padding:18px; margin-bottom:18px; }
+.qf-row { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; }
+.qf-group { display:flex; flex-direction:column; gap:4px; flex:1; min-width:100px; }
+.qf-group label { font-size:13px; color:rgba(255,255,255,.4); }
+.qf-group input,.qf-group select { background:rgba(0,0,0,.3); border:1px solid rgba(255,136,0,.15); border-radius:8px; padding:10px 12px; color:#fff; font-size:15px; font-family:inherit; outline:none; }
+.qf-group input:focus,.qf-group select:focus { border-color:#ff8800; }
+.qf-group select option { background:#1a0f0a; color:#fff; }
+.btn { padding:10px 24px; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; letter-spacing:.5px; transition:all .2s; white-space:nowrap; }
+.btn-p { background:linear-gradient(135deg,#ff8800,#ff6600); color:#fff; }
+.btn-p:hover { box-shadow:0 4px 16px rgba(255,136,0,.3); transform:translateY(-1px); }
+.suggest-wrap { position:relative; }
+.suggest-list { position:absolute; top:100%; left:0; right:0; background:#1a0f0a; border:1px solid rgba(255,136,0,.3); border-radius:0 0 8px 8px; max-height:180px; overflow-y:auto; z-index:10; display:none; }
+.suggest-list.show { display:block; }
+.suggest-list div { padding:8px 12px; font-size:14px; cursor:pointer; }
+.suggest-list div:hover { background:rgba(255,136,0,.15); }
+.rstatus { padding:6px 0; font-size:13px; color:rgba(255,255,255,.45); margin-bottom:10px; }
+.plan-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,136,0,.12); border-radius:14px; padding:20px; margin-bottom:14px; }
+.plan-card.best { border-left:3px solid #ff8800; }
+.plan-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.plan-title { font-size:18px; font-weight:900; color:#ff8800; }
+.plan-badge { font-size:12px; padding:3px 10px; border-radius:8px; font-weight:600; }
+.plan-badge.rec { background:rgba(255,136,0,.15); color:#ff8800; }
+.plan-badge.alt { background:rgba(255,255,255,.06); color:rgba(255,255,255,.4); }
+.plan-steps { margin-left:8px; border-left:2px solid rgba(255,136,0,.2); padding-left:20px; }
+.step { padding:8px 0; position:relative; font-size:15px; line-height:1.8; }
+.step::before { content:''; position:absolute; left:-25px; top:13px; width:8px; height:8px; border-radius:50%; background:#ff8800; }
+.step-icon { margin-right:6px; }
+.step-highlight { color:#ffcc00; font-weight:600; }
+.step-dim { color:rgba(255,255,255,.4); }
+.step-time { font-family:'SF Mono','Consolas',monospace; color:#ff8800; }
+.empty { text-align:center; padding:40px; color:rgba(255,255,255,.2); }
+.empty .ph-icon { font-size:36px; margin-bottom:10px; }
+.loading { text-align:center; padding:30px; }
+.spinner { display:inline-block; width:26px; height:26px; border:3px solid rgba(255,136,0,.1); border-top-color:#ff8800; border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.toast { position:fixed; top:16px; right:16px; background:rgba(255,82,82,.12); border:1px solid rgba(255,82,82,.3); color:#ff5252; padding:10px 16px; border-radius:8px; font-size:14px; z-index:999; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="badge">乘务专业AI工具集 · v2</div><h1>🚀 添乘助手</h1><div class="sub">双向列车匹配 · 最快添乘故障列车 · 双时刻表</div></div>
+<div class="top-bar"><span class="tb-label">📅 时刻表</span><select id="ttSelect"></select><span class="tb-label" style="margin-left:12px;">👤 岗位</span><select id="roleSelect" onchange="onRoleChange(this.value)"><option value="">不选择岗位</option><option value="东郭庄">东郭庄轮值</option><option value="兴国路">兴国派班</option><option value="海泊桥（海慈医疗）">海泊桥轮值</option><option value="山里">山里派班</option><option value="王家港">王家港轮值</option></select><span style="flex:1;"></span><span class="tb-label">🕐 当前时间</span><span class="tb-current" id="liveClock">--:--:--</span></div>
+<div class="qf"><div class="qf-row"><div class="qf-group" style="max-width:200px;"><label>目标列车车次号</label><input type="text" id="targetNo" placeholder="4位或6位" autocomplete="off"></div><div class="qf-group suggest-wrap" style="flex:2;min-width:160px;"><label>你的当前位置（车站名）</label><input type="text" id="myStation" placeholder="例: 台东" autocomplete="off"><div class="suggest-list" id="sList"></div></div><button class="btn btn-p" id="btnQ">推算添乘</button></div></div>
+<div id="posBar" style="display:none;margin-bottom:16px;padding:12px 16px;background:rgba(0,230,180,.06);border:1px solid rgba(0,230,180,.15);border-radius:10px;font-size:14px;color:rgba(255,255,255,.75)"><span id="posText"></span></div>
+<div id="results"><div class="empty"><div class="ph-icon">🔍</div>输入故障车次和所在车站，推算最快添乘路径</div></div>
+</div>
+<script>
+(function(){var el=document.getElementById('liveClock');function tick(){var n=new Date();el.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0')}setInterval(tick,1e3);tick()})();
+</script>
+<script src="Z01152_data.js"></script>
+<script src="Z01647_data.js"></script>
+<script src="timetable-registry.js"></script>
+<script>
+let trains=[],tIdx={},stIdx={},allStations=[];
+function nowStr(){var n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0')}
+function t2s(t){if(!t)return Infinity;var p=t.split(':').map(Number);return p[0]*3600+p[1]*60+(p[2]||0)}
+function toast(m){var e=document.createElement('div');e.className='toast';e.textContent=m;document.body.appendChild(e);setTimeout(function(){e.remove()},2500)}
+function loadTT(key){var r=document.getElementById('results');r.innerHTML='<div class="loading"><div class="spinner"></div></div>';try{var raw=getTTData(key);if(!raw||!raw.trains)throw new Error('load failed');trains=raw.trains.map(function(t){return{trainNo:t.no,direction:t.dir===1?'下行':'上行',directionCode:t.dir,schedule:t.stations.map(function(s){return{station:s.n,arrival:s.a||null,departure:s.b||null}}),stationCount:t.stations.length}});var ss=new Set();for(var i=0;i<trains.length;i++){var t=trains[i];for(var j=0;j<t.schedule.length;j++)ss.add(t.schedule[j].station)}allStations=[].concat(Array.from(ss)).sort();tIdx={};for(var i=0;i<trains.length;i++){var t=trains[i];tIdx[t.trainNo]=t;var s4=t.trainNo.slice(-4);if(!tIdx[s4])tIdx[s4]=t;else if(Array.isArray(tIdx[s4]))tIdx[s4].push(t);else tIdx[s4]=[tIdx[s4],t]}stIdx={};for(var i=0;i<trains.length;i++){var t=trains[i];var dk=t.directionCode===1?'down':'up';for(var j=0;j<t.schedule.length;j++){var sn=t.schedule[j].station;if(!stIdx[sn])stIdx[sn]={down:[],up:[]};stIdx[sn][dk].push(t)}}r.innerHTML='<div class="empty"><div class="ph-icon">🔍</div>输入故障车次和所在车站，推算最快添乘路径</div>'}catch(e){r.innerHTML='<div class="empty"><div class="ph-icon">⚠️</div>加载失败</div>';console.error(e)}}
+function findTrain(n){n=n.trim();if(!n)return null;var dc=null;if(n.length===6){dc=parseInt(n[2]);var v=tIdx[n];if(v){var arr=Array.isArray(v)?v:[v];var f=arr.filter(function(t){return t.directionCode===dc});return f.length?f:arr}}else{dc=parseInt(n[0]);var v=tIdx[n];if(v){var arr=Array.isArray(v)?v:[v];var f=arr.filter(function(t){return t.directionCode===dc});if(f.length)return f}var cs=[];for(var i=0;i<trains.length;i++){var t=trains[i];if(t.trainNo.slice(-4)===n&&t.directionCode===dc)cs.push(t)}if(cs.length)return cs}return null}
+function computePlan(myStation,targetTrain,ct){var ctSec=t2s(ct);var targetSch=targetTrain.schedule;var targetDir=targetTrain.directionCode;var oppDir=targetDir===1?2:1;var targetFuture=[];var found=false;for(var i=0;i<targetSch.length;i++){var s=targetSch[i];var tm=s.arrival||s.departure;if(!tm)continue;if(!found&&t2s(tm)>=ctSec-60)found=true;if(found)targetFuture.push({station:s.station,time:tm,ts:t2s(tm)})}var interceptPlans=[];var directPlan=null;var oppKey=oppDir===1?'down':'up';var oppTrains=stIdx[myStation]&&stIdx[myStation][oppKey]?stIdx[myStation][oppKey]:[];for(var i=0;i<oppTrains.length;i++){var oppTrain=oppTrains[i];var myStop=oppTrain.schedule.find(function(s){return s.station===myStation});if(!myStop)continue;var oppDepart=myStop.departure||myStop.arrival;var oppDepSec=t2s(oppDepart);if(oppDepSec<ctSec-60)continue;var oppSch=oppTrain.schedule;for(var j=0;j<oppSch.length;j++){var oppStop=oppSch[j];var oppStation=oppStop.station;var oppArrive=oppStop.arrival||oppStop.departure;var oppArrSec=t2s(oppArrive);if(oppArrSec<=oppDepSec)continue;if(oppStation===myStation)continue;var targetStop=null;for(var k=0;k<targetFuture.length;k++){var ts=targetFuture[k];if(ts.station===oppStation&&ts.ts>oppArrSec){targetStop=ts;break}}if(!targetStop)continue;var waitMin=Math.max(0,Math.round((targetStop.ts-oppArrSec)/60));var totalMin=Math.max(0,Math.round((targetStop.ts-ctSec)/60));var rideMin=Math.max(0,Math.round((oppArrSec-oppDepSec)/60));interceptPlans.push({type:'intercept',title:'🚀 '+oppTrain.trainNo+' 次 → '+oppStation,oppDepSec:oppDepSec,oppTrain:oppTrain,oppDepart:oppDepart,interceptStation:oppStation,oppArriveTime:oppArrive,targetTime:targetStop.time,waitMin:waitMin,totalMin:totalMin,rideMin:rideMin,steps:[{icon:'🏃',text:'在 <span class="step-highlight">'+myStation+'</span> 乘坐对向 <span class="step-time">'+oppTrain.trainNo+'</span> 次，<span class="step-time">'+oppDepart+'</span> 发车'},{icon:'🚇',text:'乘坐 <span class="step-time">'+rideMin+'</span> 分钟至 <span class="step-highlight">'+oppStation+'</span>，<span class="step-time">'+oppArrive+'</span> 到站'},{icon:'⏳',text:'等候 <span class="step-highlight">'+waitMin+'</span> 分钟'},{icon:'🎯',text:'故障列车 <span class="step-time">'+targetTrain.trainNo+'</span> 次 <span class="step-time">'+targetStop.time+'</span> 到站，上车添乘'}]})}}interceptPlans.sort(function(a,b){return a.oppDepSec-b.oppDepSec});
+// Per train: keep only 2 best intercept stations
+var grouped={},filtered=[];
+for(var g=0;g<interceptPlans.length;g++){var p=interceptPlans[g];var k=p.oppTrain.trainNo;if(!grouped[k])grouped[k]=[];grouped[k].push(p)}
+for(var k in grouped){grouped[k].sort(function(a,b){return a.totalMin-b.totalMin});filtered=filtered.concat(grouped[k].slice(0,2))}
+filtered.sort(function(a,b){return a.oppDepSec-b.oppDepSec});
+interceptPlans=filtered;var directStation=targetFuture.find(function(s){return s.station===myStation});if(directStation&&directStation.ts>ctSec){directPlan={type:'direct',title:'🚶 原地等候添乘',steps:[{icon:'📍',text:'在 <span class="step-highlight">'+myStation+'</span> 等候故障列车'},{icon:'🎯',text:'故障列车 <span class="step-time">'+targetTrain.trainNo+'</span> 次 <span class="step-time">'+directStation.time+'</span> 到站，直接上车'}]}}var plans=[].concat(interceptPlans);if(directPlan)plans.push(directPlan);return{plans:plans,targetDir:targetDir,targetTrain:targetTrain}}
+function renderPlans(result,myStation,ct){var plans=result.plans,targetDir=result.targetDir,targetTrain=result.targetTrain;var dirText=targetDir===1?'▼下行':'▲上行';var hasCross=plans.length>0&&plans[0].crossRegion;if(!plans.length){var msg='<b style="color:#ff5252;">无法及时添乘</b><br><span style="font-size:13px;">故障列车 <span style="color:#ff8800;">'+targetTrain.trainNo+'</span> 次（'+dirText+'）当前站已过，且无对向车可拦截</span>';if(hasCross===false){msg='<b style="color:#ff5252;">无法及时添乘</b><br><span style="font-size:13px;">故障列车 <span style="color:#ff8800;">'+targetTrain.trainNo+'</span> 次（'+dirText+'）已错过所有属地</span>'}return'<div class="empty"><div class="ph-icon">😞</div>'+msg+'</div>'}var crossLabel=hasCross?' <span style="font-size:12px;background:rgba(180,100,255,.15);color:#b464ff;padding:2px 8px;border-radius:4px;">跨区域添乘</span>':'';var html='<div class="rstatus">📍 '+myStation+' 添乘故障列车 <b style="color:#ff8800;">'+targetTrain.trainNo+'</b> 次（'+dirText+'）· 当前 '+ct+' · '+plans.length+' 个方案'+crossLabel+'</div>';plans.forEach(function(p,i){var isBest=i===0;var badgeT=p.type==='intercept'?(isBest?'★ 最快拦截':'备选拦截'):'直接添乘';var badgeC=p.type==='intercept'?(isBest?'rec':'alt'):'rec';html+='<div class="plan-card'+(isBest?' best':'')+'"><div class="plan-header"><span class="plan-title">'+p.title+'</span><span class="plan-badge '+badgeC+'">'+badgeT+'</span>'+(p.totalMin!==undefined?'<span style="font-size:13px;color:rgba(255,255,255,.4);">约 '+p.totalMin+' 分钟到达目标</span>':'')+'</div><div class="plan-steps">'+p.steps.map(function(s){return'<div class="step"><span class="step-icon">'+s.icon+'</span>'+s.text+'</div>'}).join('')+'</div></div>'});return html}
+function getTrainPosition(train,ct){
+  var ns=t2s(ct),sch=train.schedule;
+  if(!sch||sch.length<1)return null;
+  var fDep=t2s(sch[0].departure||sch[0].arrival);
+  var lArr=t2s(sch[sch.length-1].arrival||sch[sch.length-1].departure);
+  if(ns<fDep)return{state:'未发车',station:sch[0].station};
+  if(ns>lArr)return{state:'已终到',station:sch[sch.length-1].station};
+  for(var i=0;i<sch.length;i++){var a=sch[i].arrival,b=sch[i].departure;if(a&&b&&ns>=t2s(a)&&ns<=t2s(b))return{state:'停站',station:sch[i].station}}
+  for(var i=0;i<sch.length-1;i++){var d=sch[i].departure||sch[i].arrival;var a=sch[i+1].arrival||sch[i+1].departure;if(ns>=t2s(d)&&ns<=t2s(a))return{state:'区间',from:sch[i].station,to:sch[i+1].station}}
+  return null}
+function getTerritory(pos){
+  var map={'东郭庄':'东郭庄轮值','沟岔':'东郭庄轮值','农业大学':'东郭庄轮值','正阳中路':'东郭庄轮值','小寨子':'东郭庄轮值','凤岗路':'东郭庄轮值','流亭':'东郭庄轮值','仙家寨（汽车北站）':'东郭庄轮值','瑞金路':'兴国派班','遵义路':'兴国派班','南岭':'兴国派班','兴国路':'兴国派班','永年路':'兴国派班','沧安路':'兴国派班','青岛北站':'兴国派班','安顺路':'兴国派班','胜利桥（纺织谷）':'兴国派班','中心医院':'海泊桥轮值','水清沟':'海泊桥轮值','北岭':'海泊桥轮值','小村庄':'海泊桥轮值','海泊桥（海慈医疗）':'海泊桥轮值','台东':'海泊桥轮值','广饶路':'海泊桥轮值','观象山（市立医院）':'海泊桥轮值','中山路':'海泊桥轮值','青岛站':'山里派班','西镇':'山里派班','团岛':'山里派班','凤凰岛':'山里派班','山里':'山里派班','南北屯':'山里派班','新港山路':'山里派班','安子':'王家港轮值','天目山路':'王家港轮值','薛家岛':'王家港轮值','丁家河':'王家港轮值','井冈山路':'王家港轮值','太行山路':'王家港轮值','石油大学':'王家港轮值','王家港':'王家港轮值'};
+  if(!pos)return'未知';
+  var s=pos.state==='区间'?pos.from:pos.station;return map[s]||'未知'}
+function formatPosition(pos,train){
+  if(!pos)return'<span style="color:rgba(255,255,255,.3)">无法推算</span>';
+  var dir=train.directionCode===1?'下行':'上行';var tt=getTerritory(pos);
+  if(pos.state==='未发车')return'🔜 尚未发车（<b>'+pos.station+'</b>站始发 '+dir+'） | 属地：<b style="color:#ff8800">'+tt+'</b>';
+  if(pos.state==='已终到')return'🏁 已终到<b>'+pos.station+'</b>站 | 属地：<b style="color:#ff8800">'+tt+'</b>';
+  if(pos.state==='停站')return'🚉 停靠<b>'+pos.station+'</b>站 | 属地：<b style="color:#ff8800">'+tt+'</b>';
+  if(pos.state==='区间')return'🚇 运行中：<b>'+pos.from+'</b> → <b>'+pos.to+'</b> | 属地：<b style="color:#ff8800">'+tt+'</b>';
+  return'?'}
+function onRoleChange(role){}
+var activeTrain=null,activeTimer=null;
+function startPositionTimer(train){activeTrain=train;if(activeTimer)clearInterval(activeTimer);activeTimer=setInterval(function(){if(!activeTrain)return;var now=nowStr();var pos=getTrainPosition(activeTrain,now);var pb=document.getElementById('posBar');var pt=document.getElementById('posText');if(pb&&pt){if(pos&&pos.state==='已终到'){pt.innerHTML=formatPosition(pos,activeTrain);clearInterval(activeTimer);activeTimer=null;activeTrain=null;return}pt.innerHTML=formatPosition(pos,activeTrain)}},1000)}
+function doQuery(){try{var ms=document.getElementById('myStation').value.trim();var tn=document.getElementById('targetNo').value.trim();var r=document.getElementById('results');var pb=document.getElementById('posBar');var pt=document.getElementById('posText');var role=document.getElementById('roleSelect').value;if(!ms){toast('请输入你的位置');return}if(!tn){toast('请输入目标车次号');return}var match=allStations.find(function(s){return s===ms});if(!match)match=allStations.find(function(s){return s===ms+'站'});if(!match)match=allStations.find(function(s){return s.replace(/站$/,'')===ms.replace(/站$/,'')});if(!match)match=allStations.find(function(s){return s.includes(ms)});if(!match)match=allStations.find(function(s){return ms.includes(s)});if(!match){r.innerHTML='<div class="empty"><div class="ph-icon">🔍</div>未找到该车站</div>';if(pb)pb.style.display='none';activeTrain=null;return}var trs=findTrain(tn);if(!trs||(Array.isArray(trs)&&!trs.length)){r.innerHTML='<div class="empty"><div class="ph-icon">🔍</div>未找到该车次</div>';if(pb)pb.style.display='none';activeTrain=null;return}var tt=Array.isArray(trs)?trs[0]:trs;var ct=nowStr();var pos=getTrainPosition(tt,ct);if(pb){pb.style.display='block';pt.innerHTML=formatPosition(pos,tt)}startPositionTimer(tt);var result=computePlan(match,tt,ct);if(!result.plans.length&&role){var terrOrder=['东郭庄','兴国路','海泊桥（海慈医疗）','山里','王家港'];var ri=terrOrder.indexOf(role);var nextIdx=tt.directionCode===1?ri+1:ri-1;if(nextIdx>=0&&nextIdx<terrOrder.length){var nextSt=terrOrder[nextIdx];var nm=allStations.find(function(s){return s===nextSt});if(nm){var nr=computePlan(nm,tt,ct);if(nr.plans.length){nr.plans.forEach(function(p){p.crossRegion=true});result=nr;match=nm}}}}r.innerHTML=renderPlans(result,match,ct)}catch(e){r.innerHTML='<div class="empty"><div class="ph-icon">⚠️</div>出错：'+e.message+'</div>';console.error(e)}}
+document.getElementById('btnQ').addEventListener('click',doQuery);
+document.getElementById('targetNo').addEventListener('keydown',function(e){if(e.key==='Enter')doQuery()});
+document.getElementById('myStation').addEventListener('keydown',function(e){if(e.key==='Enter')doQuery()});
+var sEl=document.getElementById('myStation'),sList=document.getElementById('sList');
+sEl.addEventListener('input',function(){var v=sEl.value.trim();if(!v){sList.classList.remove('show');return}var hits=allStations.filter(function(s){return s.includes(v)||s.replace(/站$/,'').includes(v)}).slice(0,8);if(!hits.length){sList.classList.remove('show');return}sList.innerHTML=hits.map(function(s){return '<div>'+s+'</div>'}).join('');sList.classList.add('show')});
+sList.addEventListener('click',function(e){if(e.target.tagName==='DIV'){sEl.value=e.target.textContent;sList.classList.remove('show')}});
+document.addEventListener('click',function(e){if(!sEl.parentElement.contains(e.target))sList.classList.remove('show')});
+document.getElementById('ttSelect').addEventListener('change',function(){loadTT(this.value)});
+populateTTSelect('Z01152');loadTT('Z01152');
+</script>
+</body>
+</html>

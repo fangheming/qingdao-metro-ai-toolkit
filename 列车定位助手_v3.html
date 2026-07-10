@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a1a1f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="列车定位助手">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>列车定位助手</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#0a1a1f,#0d262e 30%,#0a3328 60%,#0a1a1f);color:#fff;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:20px 16px}
+.header{text-align:center;padding:20px 0 16px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:18px}
+.header .badge{display:inline-block;background:rgba(0,230,180,.1);border:1px solid rgba(0,230,180,.2);color:#00e6b4;padding:3px 12px;border-radius:12px;font-size:11px;letter-spacing:2px;margin-bottom:6px}
+.header h1{font-size:26px;font-weight:900;background:linear-gradient(135deg,#00e6b4,#00c896);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header .sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}
+.top-bar{display:flex;align-items:center;padding:8px 12px;background:rgba(255,255,255,.03);border-radius:10px;margin-bottom:16px;font-size:12px;gap:12px}
+.top-bar .tb-label{color:rgba(255,255,255,.4)}
+.top-bar select{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);color:#fff;border-radius:6px;padding:6px 10px;font-family:inherit}
+.top-bar select option{background:#0d262e}
+.top-bar .tb-current{color:#00e6b4;font-family:monospace;font-size:16px;font-weight:600;margin-left:auto}
+.qf{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;margin-bottom:18px}
+.qf-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.qf-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:100px}
+.qf-group label{font-size:11px;color:rgba(255,255,255,.4)}
+.qf-group input,.qf-group select{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;font-family:inherit;outline:none}
+.qf-group input:focus,.qf-group select:focus{border-color:#00e6b4}
+.qf-group select option{background:#0d262e;color:#fff}
+.suggest-wrap{position:relative}
+.suggest-list{position:absolute;top:100%;left:0;right:0;background:#0d262e;border:1px solid rgba(0,230,180,.3);border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;z-index:10;display:none}
+.suggest-list.show{display:block}
+.suggest-list div{padding:8px 12px;font-size:13px;cursor:pointer}
+.suggest-list div:hover{background:rgba(0,230,180,.15)}
+.btn{padding:10px 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-p{background:linear-gradient(135deg,#00e6b4,#00c896);color:#0a1a1f}
+.btn-p:hover{box-shadow:0 4px 16px rgba(0,230,180,.3)}
+.rstatus{padding:6px 0;font-size:12px;color:rgba(255,255,255,.45);margin-bottom:10px}
+.train-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:18px 20px;margin-bottom:12px}
+.tc-no{font-size:32px;font-weight:900;color:#00e6b4}
+.tc-dir{font-size:14px;padding:3px 12px;border-radius:8px;font-weight:600;margin-left:12px}
+.tc-dir.d{background:rgba(240,192,64,.15);color:#f0c040}
+.tc-dir.u{background:rgba(64,144,255,.15);color:#4a9eff}
+.tc-pos{padding:10px 16px;background:rgba(0,230,180,.05);border:1px solid rgba(0,230,180,.1);border-radius:8px;font-size:16px;line-height:1.8;margin-top:8px}
+.tc-pos .pdim{color:rgba(255,255,255,.4)}
+.tc-pos .pval{color:#00e6b4;font-weight:600;font-size:18px}
+.timeline{margin-top:8px;max-height:400px;overflow-y:auto}
+.timeline::-webkit-scrollbar{width:4px}
+.timeline::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+.tl-row{display:flex;gap:10px;padding:5px 8px;font-size:12px;border-bottom:1px solid rgba(255,255,255,.015);align-items:center}
+.tl-row.passed{color:rgba(255,255,255,.15)}
+.tl-row.current{color:#00e6b4;font-weight:600;background:rgba(0,230,180,.06);padding:8px 8px;border-radius:6px}
+.tl-row.upcoming{color:rgba(255,255,255,.55)}
+.tl-time{min-width:130px;font-family:monospace;font-size:11px}
+.tl-station{flex:1}
+.st-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 18px;margin-bottom:10px;cursor:pointer}
+.st-card:hover{border-color:rgba(255,255,255,.15)}
+.st-dir{font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600}
+.st-dir.d{background:rgba(240,192,64,.1);color:#f0c040}
+.st-dir.u{background:rgba(64,144,255,.1);color:#4a9eff}
+.st-info{font-size:12px;color:rgba(255,255,255,.5);margin-top:6px}
+.route-tag{display:inline-block;padding:4px 12px;border-radius:6px;font-size:14px;font-weight:600;margin:2px;background:rgba(240,160,40,.2);color:#f0c040;border:1px solid rgba(240,192,64,.25)}
+.placeholder{text-align:center;padding:40px;color:rgba(255,255,255,.2)}
+.ph-icon{font-size:36px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="badge">乘务专业AI工具集</div><h1>列车定位助手</h1><div class="sub">精确车次查询 · 车站模糊定位</div></div>
+<div class="top-bar"><span class="tb-label">时刻表</span><select id="ttSelect"></select><span class="tb-current" id="liveClock">--:--:--</span></div>
+<div class="qf"><div class="qf-row">
+<div class="qf-group" style="max-width:200px"><label>车次号</label><input type="text" id="tNo" placeholder="如 211034" autocomplete="off"></div>
+<div class="qf-group suggest-wrap" style="flex:2;min-width:160px"><label>车站名称</label><input type="text" id="sName" placeholder="如 台东" autocomplete="off"><div class="suggest-list" id="sList"></div></div>
+<div class="qf-group" style="max-width:120px"><label>方向</label><select id="sDir"><option value="0">不限</option><option value="1">下行</option><option value="2">上行</option></select></div>
+<button class="btn btn-p" id="btnQ">定位</button>
+</div></div>
+<div id="results"><div class="placeholder"><div class="ph-icon">[S]</div>输入车次号开始定位</div></div>
+</div>
+<script src="Z01152_data.js"></script>
+<script src="Z01647_data.js"></script>
+<script src="timetable-registry.js"></script>
+<script src="app.js?v=7"></script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(function(){
+    console.log('SW registered');
+  }).catch(function(e){
+    console.log('SW failed:', e);
+  });
+}
+</script>
+</body>
+</html>
